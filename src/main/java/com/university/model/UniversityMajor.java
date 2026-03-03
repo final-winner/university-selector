@@ -9,13 +9,13 @@ public class UniversityMajor {
     private Integer universityId;
     private String name;
     private String code;
-    private String department;
+    private Integer departmentId;
     private String rating;
-    private String tuition;
+    private Integer tuition;
     private String introduction;
     private String examSubjects;
     private String retestSubjects;
-    private String schoolingLength;
+    private Integer schoolingLength;
     private String acceptTransfer;
     private String masterType;
     private String dormitory;

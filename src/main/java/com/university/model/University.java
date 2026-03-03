@@ -7,6 +7,7 @@ import java.time.LocalDateTime;
 public class University {
     private Integer id;
     private String name;
+    private Integer collectionNum;
     private String address;
     private String city;
     private String code;

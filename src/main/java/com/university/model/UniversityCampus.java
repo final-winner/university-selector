@@ -12,7 +12,5 @@ public class UniversityCampus {
     private String address; // 校区地址
     private String city; // 校区城市
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
-    private Date createTime;
-    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     private Date updateTime;
 }
