@@ -7,6 +7,7 @@ import com.university.model.User;
 import com.university.model.University;
 import com.university.model.UserFavorite;
 import com.university.service.UserService;
+import com.university.service.UniversityService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -23,6 +24,9 @@ public class UserServiceImpl implements UserService {
     
     @Autowired
     private UniversityMapper universityMapper;
+    
+    @Autowired
+    private UniversityService universityService;
 
     @Override
     public User selectByUsername(String username) {
@@ -87,12 +91,22 @@ public class UserServiceImpl implements UserService {
         UserFavorite favorite = new UserFavorite();
         favorite.setUserId(userId);
         favorite.setUniversityId(universityId);
-        return userFavoriteMapper.insert(favorite) > 0;
+        int insertResult = userFavoriteMapper.insert(favorite);
+        boolean success = insertResult > 0;
+        if (success) {
+            universityMapper.updateCollectionNum(universityId, 1);
+        }
+        return success;
     }
 
     @Override
     public boolean removeFavorite(Integer userId, Integer universityId) {
-        return userFavoriteMapper.deleteByUserIdAndUniversityId(userId, universityId) > 0;
+        int deleteResult = userFavoriteMapper.deleteByUserIdAndUniversityId(userId, universityId);
+        boolean success = deleteResult > 0;
+        if (success) {
+            universityMapper.updateCollectionNum(universityId, -1);
+        }
+        return success;
     }
 
     @Override

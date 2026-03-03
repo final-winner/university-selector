@@ -166,7 +166,7 @@ export default {
     const fetchHotUniversities = async () => {
       try {
         isLoading.value = true
-        const data = await universityApi.getAllUniversities()
+        const data = await universityApi.getHotUniversities()
         universities.value = data.slice(0, 6)
       } catch (error) {
         console.error('获取热门院校失败:', error)

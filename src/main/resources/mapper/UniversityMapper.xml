@@ -5,6 +5,7 @@
     <resultMap id="BaseResultMap" type="com.university.model.University">
         <id column="id" property="id"/>
         <result column="name" property="name"/>
+        <result column="collection_num" property="collectionNum"/>
         <result column="address" property="address"/>
         <result column="city" property="city"/>
         <result column="code" property="code"/>
@@ -100,4 +101,12 @@
         ORDER BY
             d.name, m.name, pd.year
     </select>
+    
+    <select id="selectHotUniversities" resultMap="BaseResultMap">
+        SELECT * FROM university ORDER BY collection_num DESC, id
+    </select>
+    
+    <update id="updateCollectionNum">
+        UPDATE university SET collection_num = collection_num + #{increment} WHERE id = #{universityId} AND (#{increment} > 0 OR collection_num > 0)
+    </update>
 </mapper>

@@ -21,6 +21,12 @@
               </router-link>
             </li>
             <li class="list-item">
+              <router-link class="nav-link" to="/ranking" @click="closeNavbar">
+                <Award class="h-3 w-3 mr-2" />
+                排行榜
+              </router-link>
+            </li>
+            <li class="list-item">
               <a class="nav-link" href="javascript:void(0)" @click="handleAuthNavigate('/recommend', true)">
                 <Lightbulb class="h-3 w-3 mr-2" />
                 智能推荐
@@ -73,6 +79,12 @@
             </router-link>
           </li>
           <li>
+            <router-link class="nav-link" to="/ranking" @click="closeNavbar">
+              <Award class="h-3 w-3 mr-2" />
+              排行榜
+            </router-link>
+          </li>
+          <li>
             <a class="nav-link" href="javascript:void(0)" @click="handleAuthNavigate('/recommend', true)">
               <Lightbulb class="h-3 w-3 mr-2" />
               智能推荐
@@ -105,7 +117,7 @@
 
 <script>
 import { ref, onMounted } from 'vue'
-import { Home, List, Lightbulb, BarChart, Menu, User } from 'lucide-vue-next'
+import { Home, List, Award, Lightbulb, BarChart, Menu, User } from 'lucide-vue-next'
 import { useRouter } from 'vue-router'
 import { useAuth } from '@/composables/useAuth'
 
@@ -114,6 +126,7 @@ export default {
   components: {
     Home,
     List,
+    Award,
     Lightbulb,
     BarChart,
     Menu,

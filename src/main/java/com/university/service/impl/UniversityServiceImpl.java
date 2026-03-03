@@ -27,4 +27,12 @@ public class UniversityServiceImpl implements UniversityService {
     public List<Map<String, Object>> getCollegesByUniversityId(Integer universityId) {
         return universityMapper.getCollegesByUniversityId(universityId);
     }
+    @Override
+    public List<University> getHotUniversities() {
+        return universityMapper.selectHotUniversities();
+    }
+    @Override
+    public void updateCollectionNum(Integer universityId, int increment) {
+        universityMapper.updateCollectionNum(universityId, increment);
+    }
 }

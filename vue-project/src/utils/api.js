@@ -50,8 +50,20 @@ export const universityApi = {
    * @param {number} id - 院校ID
    * @returns {Promise} - 学院列表
    */
-  getCollegesByUniversityId: (id) => apiRequest(`/university/colleges/${id}`)
+  getCollegesByUniversityId: (id) => apiRequest(`/university/colleges/${id}`),
+
+  /**
+   * 获取热门院校列表
+   * @returns {Promise} - 热门院校列表
+   */
+  getHotUniversities: () => apiRequest('/university/hot')
 };
+
+/**
+ * 获取热门院校列表
+ * @returns {Promise} - 热门院校列表
+ */
+export const getHotUniversities = () => apiRequest('/university/hot');
 
 /**
  * 用户相关API

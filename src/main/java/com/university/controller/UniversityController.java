@@ -32,5 +32,10 @@ public class UniversityController {
     public List<Map<String, Object>> getCollegesByUniversityId(@PathVariable Integer id) {
         return universityService.getCollegesByUniversityId(id);
     }
+    
+    @GetMapping("/hot")
+    public List<University> getHotUniversities() {
+        return universityService.getHotUniversities();
+    }
 }
 

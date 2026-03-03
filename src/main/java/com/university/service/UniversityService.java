@@ -9,4 +9,6 @@ public interface UniversityService {
     List<University> selectAll();
     University selectById(Integer id);
     List<Map<String, Object>> getCollegesByUniversityId(Integer universityId);
+    List<University> getHotUniversities();
+    void updateCollectionNum(Integer universityId, int increment);
 }

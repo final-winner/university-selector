@@ -50,6 +50,12 @@ const routes = [
     name: 'Profile',
     component: () => import('@/views/Profile.vue'),
     meta: { requiresAuth: true }
+  },
+  {
+    path: '/ranking',
+    name: 'Ranking',
+    component: () => import('@/views/Ranking.vue'),
+    meta: { requiresAuth: false }
   }
 ]
 
