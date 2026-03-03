@@ -8,14 +8,14 @@
           <div class="form-row">
             <div class="form-group">
               <label>院校1</label>
-              <select v-model="compareData.university1">
+              <select v-model="compareData.university1" style="width: 100%; padding: 14px 18px; border: 2px solid #e6f0ff; border-radius: 12px; font-size: 1rem; transition: all 0.3s ease; background: white; color: #1a365d; outline: none;" onfocus="this.style.borderColor = 'var(--primary-color)'; this.style.boxShadow = '0 0 0 3px rgba(30, 58, 138, 0.1)';" onblur="this.style.borderColor = '#e6f0ff'; this.style.boxShadow = 'none';">
                 <option value="">请选择</option>
                 <option v-for="uni in universities" :key="uni.id" :value="uni.id">{{ uni.name }}</option>
               </select>
             </div>
             <div class="form-group">
               <label>院校2</label>
-              <select v-model="compareData.university2">
+              <select v-model="compareData.university2" style="width: 100%; padding: 14px 18px; border: 2px solid #e6f0ff; border-radius: 12px; font-size: 1rem; transition: all 0.3s ease; background: white; color: #1a365d; outline: none;" onfocus="this.style.borderColor = 'var(--primary-color)'; this.style.boxShadow = '0 0 0 3px rgba(30, 58, 138, 0.1)';" onblur="this.style.borderColor = '#e6f0ff'; this.style.boxShadow = 'none';">
                 <option value="">请选择</option>
                 <option v-for="uni in universities" :key="uni.id" :value="uni.id">{{ uni.name }}</option>
               </select>
@@ -29,42 +29,42 @@
           <div class="compare-table">
             <table class="table">
               <thead>
-                <tr>
-                  <th>对比项</th>
-                  <th>{{ uni1.name }}</th>
-                  <th>{{ uni2.name }}</th>
+                <tr class="bg-primary text-white">
+                  <th class="text-center">对比项</th>
+                  <th class="text-center">{{ uni1.name }}</th>
+                  <th class="text-center">{{ uni2.name }}</th>
                 </tr>
               </thead>
               <tbody>
                 <tr>
-                  <td>院校类型</td>
-                  <td>{{ uni1.type }}</td>
-                  <td>{{ uni2.type }}</td>
+                  <td class="text-center">院校类型</td>
+                  <td class="text-center">{{ uni1.type }}</td>
+                  <td class="text-center">{{ uni2.type }}</td>
                 </tr>
                 <tr>
-                  <td>地区</td>
-                  <td>{{ uni1.location }}</td>
-                  <td>{{ uni2.location }}</td>
+                  <td class="text-center">地区</td>
+                  <td class="text-center">{{ uni1.location }}</td>
+                  <td class="text-center">{{ uni2.location }}</td>
                 </tr>
                 <tr>
-                  <td>分区</td>
-                  <td>{{ uni1.region }}</td>
-                  <td>{{ uni2.region }}</td>
+                  <td class="text-center">分区</td>
+                  <td class="text-center">{{ uni1.region }}</td>
+                  <td class="text-center">{{ uni2.region }}</td>
                 </tr>
                 <tr>
-                  <td>学科评估</td>
-                  <td>{{ uni1.level }}</td>
-                  <td>{{ uni2.level }}</td>
+                  <td class="text-center">学科评估</td>
+                  <td class="text-center">{{ uni1.level }}</td>
+                  <td class="text-center">{{ uni2.level }}</td>
                 </tr>
                 <tr>
-                  <td>软科排名</td>
-                  <td>{{ uni1.rankings[0].rank }}</td>
-                  <td>{{ uni2.rankings[0].rank }}</td>
+                  <td class="text-center">软科排名</td>
+                  <td class="text-center">{{ uni1.rankings[0].rank }}</td>
+                  <td class="text-center">{{ uni2.rankings[0].rank }}</td>
                 </tr>
                 <tr>
-                  <td>QS排名</td>
-                  <td>{{ uni1.rankings[3].rank }}</td>
-                  <td>{{ uni2.rankings[3].rank }}</td>
+                  <td class="text-center">QS排名</td>
+                  <td class="text-center">{{ uni1.rankings[3].rank }}</td>
+                  <td class="text-center">{{ uni2.rankings[3].rank }}</td>
                 </tr>
               </tbody>
             </table>
@@ -133,6 +133,17 @@ export default {
         uni1.value = universities.value.find(u => u.id === compareData.value.university1)
         uni2.value = universities.value.find(u => u.id === compareData.value.university2)
         showResult.value = true
+        window.$showToast({
+          title: '对比成功',
+          message: '已生成院校对比结果',
+          type: 'success'
+        })
+      } else {
+        window.$showToast({
+          title: '提示',
+          message: '请选择两所院校进行对比！',
+          type: 'warning'
+        })
       }
     }
 

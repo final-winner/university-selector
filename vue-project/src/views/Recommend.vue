@@ -7,43 +7,37 @@
           <h2>填写您的信息</h2>
           <div class="form-row">
             <div class="form-group">
-              <label>本科院校类型</label>
-              <select v-model="formData.undergraduateType" class="w-full p-4 border-2 border-border-color rounded-lg focus:outline-none focus:border-primary transition-colors">
-                <option value="">请选择</option>
-                <option value="985">985院校</option>
-                <option value="211">211院校</option>
-                <option value="double-first-class">双一流院校</option>
-                <option value="ordinary">双非院校</option>
-              </select>
+              <label>预估总分 <span class="required">*</span></label>
+              <input
+                type="number"
+                v-model="formData.score"
+                placeholder="请输入预估考研分数（0-500）"
+                min="0"
+                max="500"
+                required
+                style="width: 100%; padding: 14px 18px; border: 2px solid #e6f0ff; border-radius: 12px; font-size: 1rem; transition: all 0.3s ease; background: white; color: #1a365d; outline: none;"
+                onfocus="this.style.borderColor = 'var(--primary-color)'; this.style.boxShadow = '0 0 0 3px rgba(30, 58, 138, 0.1)';"
+                onblur="this.style.borderColor = '#e6f0ff'; this.style.boxShadow = 'none';"
+              />
             </div>
             <div class="form-group">
-              <label>目标地区</label>
-              <select v-model="formData.targetRegion" class="w-full p-4 border-2 border-border-color rounded-lg focus:outline-none focus:border-primary transition-colors">
+              <label>学科门类 <span class="required">*</span></label>
+              <select v-model="formData.subjectCategory" required style="width: 100%; padding: 14px 18px; border: 2px solid #e6f0ff; border-radius: 12px; font-size: 1rem; transition: all 0.3s ease; background: white; color: #1a365d; outline: none;" onfocus="this.style.borderColor = 'var(--primary-color)'; this.style.boxShadow = '0 0 0 3px rgba(30, 58, 138, 0.1)';" onblur="this.style.borderColor = '#e6f0ff'; this.style.boxShadow = 'none';">
                 <option value="">请选择</option>
-                <option value="A区">A区</option>
-                <option value="B区">B区</option>
+                <option value="0812">计算机科学与技术</option>
+                <option value="0835">软件工程</option>
+                <option value="0839">网络空间安全</option>
+                <option value="0854">电子信息</option>
               </select>
             </div>
           </div>
           <div class="form-row">
             <div class="form-group">
-              <label>目标院校类型</label>
-              <select v-model="formData.targetType" class="w-full p-4 border-2 border-border-color rounded-lg focus:outline-none focus:border-primary transition-colors">
+              <label>学硕/专硕 <span class="required">*</span></label>
+              <select v-model="formData.degreeType" required style="width: 100%; padding: 14px 18px; border: 2px solid #e6f0ff; border-radius: 12px; font-size: 1rem; transition: all 0.3s ease; background: white; color: #1a365d; outline: none;" onfocus="this.style.borderColor = 'var(--primary-color)'; this.style.boxShadow = '0 0 0 3px rgba(30, 58, 138, 0.1)';" onblur="this.style.borderColor = '#e6f0ff'; this.style.boxShadow = 'none';">
                 <option value="">请选择</option>
-                <option value="985">985院校</option>
-                <option value="211">211院校</option>
-                <option value="double-first-class">双一流院校</option>
-                <option value="ordinary">双非院校</option>
-              </select>
-            </div>
-            <div class="form-group">
-              <label>专业方向</label>
-              <select v-model="formData.major" class="w-full p-4 border-2 border-border-color rounded-lg focus:outline-none focus:border-primary transition-colors">
-                <option value="">请选择</option>
-                <option value="cs">计算机科学与技术</option>
-                <option value="se">软件工程</option>
-                <option value="ai">人工智能</option>
-                <option value="bigdata">大数据</option>
+                <option value="academic">学硕</option>
+                <option value="professional">专硕</option>
               </select>
             </div>
           </div>
@@ -52,36 +46,95 @@
 
         <div class="recommend-result" v-if="showResult">
           <h2>推荐院校</h2>
-          <div class="recommend-table">
-            <table class="table">
-              <thead>
-                <tr>
-                  <th>院校名称</th>
-                  <th>地区</th>
-                  <th>类型</th>
-                  <th>学科评估</th>
-                  <th>匹配度</th>
-                  <th>推荐理由</th>
-                  <th>操作</th>
-                </tr>
-              </thead>
-              <tbody>
-                <tr v-for="uni in recommendations" :key="uni.id">
-                  <td class="font-semibold text-primary">{{ uni.name }}</td>
-                  <td>{{ uni.location }}</td>
-                  <td>{{ uni.type }}</td>
-                  <td>{{ uni.level }}</td>
-                  <td>{{ uni.matchRate }}%</td>
-                  <td>{{ uni.reason }}</td>
-                  <td>
-                    <router-link :to="`/university-detail/${uni.id}`" class="btn btn-primary btn-sm mr-2">查看详情</router-link>
-                    <button class="btn btn-outline-secondary btn-sm" @click="toggleFavorite(uni.id)">
-                      <Heart :class="isFavorite(uni.id) ? 'fill-current text-red-500' : 'text-text-secondary'" class="h-4 w-4" />
-                    </button>
-                  </td>
-                </tr>
-              </tbody>
-            </table>
+          
+          <!-- 冲 - 冲刺院校 -->
+          <div class="recommend-category">
+            <h3 class="category-title-sprint">冲刺院校</h3>
+            <div class="schools-grid">
+              <div v-for="uni in sprintSchools" :key="uni.id" class="university-card sprint-card">
+                <div class="card-header">
+                  <h4 class="school-name">{{ uni.name }}</h4>
+                  <span class="school-tag sprint-tag">冲</span>
+                </div>
+                <div class="card-body">
+                  <div class="school-info">
+                    <p><strong>地区：</strong>{{ uni.location }}</p>
+                    <p><strong>类型：</strong>{{ uni.type }}</p>
+                    <p><strong>学科评估：</strong>{{ uni.level }}</p>
+                    <p><strong>匹配度：</strong><span class="match-rate">{{ uni.matchRate }}%</span></p>
+                  </div>
+                  <p class="school-reason">{{ uni.reason }}</p>
+                </div>
+                <div class="card-footer">
+                  <router-link :to="`/university-detail/${uni.id}`" class="btn btn-primary">查看详情</router-link>
+                  <button class="btn btn-favorite" @click="toggleFavorite(uni.id)" :class="isFavorite(uni.id) ? 'active' : ''">
+                    <span :class="isFavorite(uni.id) ? 'text-red-500' : 'text-gray-300'" style="font-size: 16px;">
+                      {{ isFavorite(uni.id) ? '❤' : '♡' }}
+                    </span>
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+          
+          <!-- 稳 - 稳妥院校 -->
+          <div class="recommend-category">
+            <h3 class="category-title-safe">稳妥院校</h3>
+            <div class="schools-grid">
+              <div v-for="uni in safeSchools" :key="uni.id" class="university-card safe-card">
+                <div class="card-header">
+                  <h4 class="school-name">{{ uni.name }}</h4>
+                  <span class="school-tag safe-tag">稳</span>
+                </div>
+                <div class="card-body">
+                  <div class="school-info">
+                    <p><strong>地区：</strong>{{ uni.location }}</p>
+                    <p><strong>类型：</strong>{{ uni.type }}</p>
+                    <p><strong>学科评估：</strong>{{ uni.level }}</p>
+                    <p><strong>匹配度：</strong><span class="match-rate">{{ uni.matchRate }}%</span></p>
+                  </div>
+                  <p class="school-reason">{{ uni.reason }}</p>
+                </div>
+                <div class="card-footer">
+                  <router-link :to="`/university-detail/${uni.id}`" class="btn btn-primary">查看详情</router-link>
+                  <button class="btn btn-favorite" @click="toggleFavorite(uni.id)" :class="isFavorite(uni.id) ? 'active' : ''">
+                    <span :class="isFavorite(uni.id) ? 'text-red-500' : 'text-gray-300'" style="font-size: 16px;">
+                      {{ isFavorite(uni.id) ? '❤' : '♡' }}
+                    </span>
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+          
+          <!-- 保 - 保底院校 -->
+          <div class="recommend-category">
+            <h3 class="category-title-backup">保底院校</h3>
+            <div class="schools-grid">
+              <div v-for="uni in backupSchools" :key="uni.id" class="university-card backup-card">
+                <div class="card-header">
+                  <h4 class="school-name">{{ uni.name }}</h4>
+                  <span class="school-tag backup-tag">保</span>
+                </div>
+                <div class="card-body">
+                  <div class="school-info">
+                    <p><strong>地区：</strong>{{ uni.location }}</p>
+                    <p><strong>类型：</strong>{{ uni.type }}</p>
+                    <p><strong>学科评估：</strong>{{ uni.level }}</p>
+                    <p><strong>匹配度：</strong><span class="match-rate">{{ uni.matchRate }}%</span></p>
+                  </div>
+                  <p class="school-reason">{{ uni.reason }}</p>
+                </div>
+                <div class="card-footer">
+                  <router-link :to="`/university-detail/${uni.id}`" class="btn btn-primary">查看详情</router-link>
+                  <button class="btn btn-favorite" @click="toggleFavorite(uni.id)" :class="isFavorite(uni.id) ? 'active' : ''">
+                    <span :class="isFavorite(uni.id) ? 'text-red-500' : 'text-gray-300'" style="font-size: 16px;">
+                      {{ isFavorite(uni.id) ? '❤' : '♡' }}
+                    </span>
+                  </button>
+                </div>
+              </div>
+            </div>
           </div>
         </div>
       </div>
@@ -91,74 +144,138 @@
 
 <script>
 import { ref } from 'vue'
-import { Heart } from 'lucide-vue-next'
+import { useAuth } from '@/composables/useAuth'
+
+const { checkLogin, user, checkLoginStatus } = useAuth()
+const API_BASE_URL = 'http://localhost:8080'
 
 export default {
   name: 'Recommend',
   components: {
-    Heart
   },
   setup() {
+    checkLoginStatus()
     const formData = ref({
-      undergraduateType: '',
-      targetRegion: '',
-      targetType: '',
-      major: ''
+      score: '',
+      subjectCategory: '',
+      degreeType: ''
     })
     const showResult = ref(false)
-    const recommendations = ref([])
+    const sprintSchools = ref([])
+    const safeSchools = ref([])
+    const backupSchools = ref([])
     const favorites = ref([])
 
     const getRecommendations = () => {
+      // 验证必填项
+      if (!formData.value.score || !formData.value.subjectCategory || !formData.value.degreeType) {
+        window.$showToast({
+          title: '提示',
+          message: '请填写所有必填项！',
+          type: 'warning'
+        });
+        return;
+      }
+      
       showResult.value = true
-      recommendations.value = [
-        {
-          id: 1,
-          name: '北京大学',
-          location: '北京',
-          type: '985',
-          level: 'A+',
-          matchRate: 95,
-          reason: '根据您的条件，该校在专业实力和地理位置上都非常匹配'
-        },
-        {
-          id: 2,
-          name: '清华大学',
-          location: '北京',
-          type: '985',
-          level: 'A+',
-          matchRate: 92,
-          reason: '该校计算机专业实力强劲，符合您的专业方向'
-        },
-        {
-          id: 3,
-          name: '浙江大学',
-          location: '浙江',
-          type: '985',
-          level: 'A+',
-          matchRate: 88,
-          reason: '该校综合实力强，计算机专业排名靠前'
-        }
+      const score = parseInt(formData.value.score) || 0
+      
+      // 根据分数生成推荐院校
+      // 冲刺院校：分数要求高于用户分数10-20分
+      // 稳妥院校：分数要求与用户分数相近
+      // 保底院校：分数要求低于用户分数10-20分
+      
+      // 模拟院校数据
+      const allSchools = [
+        // 冲刺院校（高分）
+        { id: 1, name: '北京大学', location: '北京', type: '985', level: 'A+', requiredScore: 400, reason: '国内顶尖名校，计算机专业实力最强' },
+        { id: 2, name: '清华大学', location: '北京', type: '985', level: 'A+', requiredScore: 395, reason: '计算机专业排名第一，就业前景极佳' },
+        { id: 3, name: '浙江大学', location: '浙江', type: '985', level: 'A+', requiredScore: 390, reason: '综合实力强，计算机专业全国前三' },
+        
+        // 稳妥院校（中等分数）
+        { id: 4, name: '上海交通大学', location: '上海', type: '985', level: 'A', requiredScore: 375, reason: '地理位置优越，计算机专业实力强' },
+        { id: 5, name: '中国科学技术大学', location: '安徽', type: '985', level: 'A', requiredScore: 370, reason: '科研实力强，计算机专业性价比高' },
+        { id: 6, name: '哈尔滨工业大学', location: '黑龙江', type: '985', level: 'A', requiredScore: 365, reason: '计算机专业传统强校，实力稳定' },
+        { id: 10, name: '复旦大学', location: '上海', type: '985', level: 'A', requiredScore: 372, reason: '综合性大学，计算机专业发展迅速' },
+        { id: 11, name: '南京大学', location: '江苏', type: '985', level: 'A', requiredScore: 368, reason: '计算机专业历史悠久，实力雄厚' },
+        
+        // 保底院校（较低分数）
+        { id: 7, name: '北京邮电大学', location: '北京', type: '211', level: 'A-', requiredScore: 350, reason: '信息类专业强校，就业前景好' },
+        { id: 8, name: '西安电子科技大学', location: '陕西', type: '211', level: 'A-', requiredScore: 345, reason: '电子信息领域强校，计算机专业实力不错' },
+        { id: 9, name: '南京航空航天大学', location: '江苏', type: '211', level: 'B+', requiredScore: 340, reason: '综合实力强，计算机专业发展迅速' }
       ]
+      
+      // 分类院校
+      sprintSchools.value = allSchools.filter(school => school.requiredScore > score + 10).slice(0, 3)
+      safeSchools.value = allSchools.filter(school => school.requiredScore >= score - 10 && school.requiredScore <= score + 10).slice(0, 5)
+      backupSchools.value = allSchools.filter(school => school.requiredScore < score - 10).slice(0, 3)
+      
+      // 计算匹配度
+      sprintSchools.value.forEach(school => {
+        school.matchRate = Math.max(60, 100 - (school.requiredScore - score) * 2)
+      })
+      
+      safeSchools.value.forEach(school => {
+        school.matchRate = Math.max(70, 85 - Math.abs(school.requiredScore - score))
+      })
+      
+      backupSchools.value.forEach(school => {
+        school.matchRate = Math.max(80, 95 - (score - school.requiredScore))
+      })
     }
 
     const isFavorite = (id) => {
       return favorites.value.includes(id)
     }
 
-    const toggleFavorite = (id) => {
-      const index = favorites.value.indexOf(id)
-      if (index > -1) {
-        favorites.value.splice(index, 1)
-      } else {
-        favorites.value.push(id)
+    const toggleFavorite = async (id) => {
+      if (!checkLogin()) {
+        return
+      }
+      const isFav = favorites.value.includes(id)
+      const url = isFav 
+        ? `${API_BASE_URL}/user/favorite/remove`
+        : `${API_BASE_URL}/user/favorite/add`
+      
+      try {
+        const response = await fetch(url, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            userId: user.value.id,
+            universityId: id
+          })
+        })
+        const data = await response.json()
+        if (data.success) {
+          const index = favorites.value.indexOf(id)
+          if (index > -1) {
+            // 使用新数组确保响应式更新
+            favorites.value = favorites.value.filter(item => item !== id)
+          } else {
+            // 使用新数组确保响应式更新
+            favorites.value = [...favorites.value, id]
+          }
+        } else {
+          // 修复：当后端返回"已收藏"时，自动添加到收藏列表
+          if (data.message.includes('已收藏') && !isFav) {
+            if (!favorites.value.includes(id)) {
+              // 使用新数组确保响应式更新
+              favorites.value = [...favorites.value, id]
+            }
+          }
+        }
+      } catch (error) {
+        console.error('操作失败:', error)
       }
     }
 
     return {
       formData,
       showResult,
-      recommendations,
+      sprintSchools,
+      safeSchools,
+      backupSchools,
       favorites,
       getRecommendations,
       isFavorite,
@@ -244,35 +361,155 @@ export default {
   text-align: center;
 }
 
-.recommend-table {
-  overflow-x: auto;
+.recommend-category {
+  margin-bottom: 40px;
 }
 
-.table {
-  margin-bottom: 0;
-  width: 100%;
-  border-collapse: separate;
-  border-spacing: 0;
-}
-
-.table thead th {
-  background-color: var(--primary-color);
-  color: white;
+.category-title-sprint {
+  font-size: 1.25rem;
   font-weight: 600;
-  border: none;
-  padding: 16px;
-  text-align: left;
+  color: #ef4444;
+  margin-bottom: 20px;
+  padding-bottom: 10px;
+  border-bottom: 2px solid #ef4444;
 }
 
-.table tbody td {
-  padding: 16px;
+.category-title-safe {
+  font-size: 1.25rem;
+  font-weight: 600;
+  color: #3b82f6;
+  margin-bottom: 20px;
+  padding-bottom: 10px;
+  border-bottom: 2px solid #3b82f6;
+}
+
+.category-title-backup {
+  font-size: 1.25rem;
+  font-weight: 600;
+  color: #10b981;
+  margin-bottom: 20px;
+  padding-bottom: 10px;
+  border-bottom: 2px solid #10b981;
+}
+
+.schools-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: 20px;
+  margin-top: 20px;
+}
+
+.school-tag {
+  position: absolute;
+  top: 20px;
+  right: 20px;
+  padding: 4px 12px;
+  border-radius: 12px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: white;
+}
+
+.sprint-tag {
+  background-color: #ef4444;
+}
+
+.safe-tag {
+  background-color: #3b82f6;
+}
+
+.backup-tag {
+  background-color: #10b981;
+}
+
+.school-info {
+  margin-bottom: 16px;
+}
+
+.match-rate {
+  font-weight: 600;
+  color: var(--primary-color);
+}
+
+.school-reason {
+  font-size: 0.9rem;
+  color: #6b7280;
+  line-height: 1.5;
+  margin: 0;
+  margin-top: 12px;
+}
+
+/* 冲稳保卡片样式 */
+.university-card.sprint-card::before {
+  background-color: #ef4444;
+}
+
+.university-card.safe-card::before {
+  background-color: #3b82f6;
+}
+
+.university-card.backup-card::before {
+  background-color: #10b981;
+}
+
+.university-card .school-name {
+  margin: 0;
+  font-size: 1.2rem;
+  font-weight: 700;
+  font-family: 'Microsoft YaHei', 'PingFang SC', sans-serif;
+  padding-left: 12px;
+  color: var(--primary-color);
+}
+
+.university-card .card-header {
+  background-color: white;
+  color: var(--text-primary);
+  font-weight: bold;
+  padding: 20px 24px;
+  position: relative;
+  border-bottom: none;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.university-card .card-body {
+  padding: 20px 24px;
+  background-color: white;
+}
+
+.university-card .card-body p {
+  margin-bottom: 8px;
   color: var(--text-secondary);
-  vertical-align: middle;
-  border-bottom: 1px solid var(--border-color);
+  font-size: 0.9rem;
+  line-height: 1.5;
+  display: flex;
+  align-items: center;
 }
 
-.table tbody tr:hover {
-  background-color: var(--bg-color);
+.university-card .card-footer {
+  background-color: white;
+  padding: 16px 24px;
+  border-top: 1px solid var(--border-color);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-radius: 0 0 12px 12px;
+}
+
+.university-card .card-footer .btn {
+  border-radius: 6px;
+  padding: 8px 16px;
+  font-size: 0.85rem;
+  font-weight: 500;
+  transition: all 0.3s ease;
+}
+
+.university-card .card-footer .btn-primary {
+  background-color: var(--primary-color);
+  border: none;
+  box-shadow: 0 2px 8px rgba(59, 130, 246, 0.2);
+  color: white;
 }
 
 .recommend-btn {
@@ -283,31 +520,15 @@ export default {
   width: 100%;
 }
 
-.btn-outline-secondary {
-  background-color: transparent;
-  color: var(--text-secondary);
-  border: 1px solid var(--border-color);
-  border-radius: 8px;
-  padding: 8px 12px;
-  font-weight: 500;
-  transition: all 0.3s ease;
+.required {
+  color: #ef4444;
+  font-weight: bold;
+  margin-left: 4px;
 }
 
-.btn-outline-secondary:hover {
-  background-color: var(--border-color);
-  color: var(--text-primary);
-  border-color: var(--primary-light);
-  transform: translateY(-1px);
-}
 
-.btn-sm {
-  font-size: 0.75rem;
-  padding: 6px 12px;
-}
 
-.mr-2 {
-  margin-right: 8px;
-}
+
 
 .text-primary {
   color: var(--primary-color);
@@ -323,13 +544,30 @@ export default {
     padding: 20px;
   }
 
-  .table thead th,
-  .table tbody td {
-    padding: 12px;
+  .schools-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .school-card {
+    margin-bottom: 20px;
   }
 
   .btn {
     padding: 10px 24px;
+  }
+
+  .school-footer {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .school-footer .btn {
+    margin-right: 0;
+    margin-bottom: 10px;
+  }
+
+  .school-footer .btn:last-child {
+    margin-bottom: 0;
   }
 }
 </style>

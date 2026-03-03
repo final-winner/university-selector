@@ -1,0 +1,76 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.university.mapper.UserMapper">
+    
+    <resultMap id="BaseResultMap" type="com.university.model.User">
+        <id column="id" property="id"/>
+        <result column="phone" property="phone"/>
+        <result column="email" property="email"/>
+        <result column="target_score" property="targetScore"/>
+        <result column="avatar_url" property="avatarUrl"/>
+        <result column="target_university_id" property="targetUniversityId"/>
+        <result column="info_update_time" property="infoUpdateTime"/>
+        <result column="username" property="username"/>
+        <result column="password" property="password"/>
+        <result column="undergraduate_university_id" property="undergraduateUniversityId"/>
+        <result column="postgraduate_year" property="postgraduateYear"/>
+        <result column="create_time" property="createTime"/>
+    </resultMap>
+    
+    <select id="selectByUsername" resultMap="BaseResultMap">
+        SELECT * FROM user WHERE username = #{username}
+    </select>
+    
+    <select id="selectByPhone" resultMap="BaseResultMap">
+        SELECT * FROM user WHERE phone = #{phone}
+    </select>
+    
+    <select id="selectById" resultMap="BaseResultMap">
+        SELECT * FROM user WHERE id = #{id}
+    </select>
+    
+    <insert id="insert" parameterType="com.university.model.User" useGeneratedKeys="true" keyProperty="id">
+        INSERT INTO user (
+            <if test="phone != null">phone,</if>
+            <if test="email != null">email,</if>
+            <if test="targetScore != null">target_score,</if>
+            <if test="avatarUrl != null">avatar_url,</if>
+            <if test="targetUniversityId != null">target_university_id,</if>
+            <if test="infoUpdateTime != null">info_update_time,</if>
+            <if test="username != null">username,</if>
+            <if test="password != null">password,</if>
+            <if test="undergraduateUniversityId != null">undergraduate_university_id,</if>
+            <if test="postgraduateYear != null">postgraduate_year,</if>
+            create_time
+        ) VALUES (
+            <if test="phone != null">#{phone},</if>
+            <if test="email != null">#{email},</if>
+            <if test="targetScore != null">#{targetScore},</if>
+            <if test="avatarUrl != null">#{avatarUrl},</if>
+            <if test="targetUniversityId != null">#{targetUniversityId},</if>
+            <if test="infoUpdateTime != null">#{infoUpdateTime},</if>
+            <if test="username != null">#{username},</if>
+            <if test="password != null">#{password},</if>
+            <if test="undergraduateUniversityId != null">#{undergraduateUniversityId},</if>
+            <if test="postgraduateYear != null">#{postgraduateYear},</if>
+            #{createTime}
+        )
+    </insert>
+    
+    <update id="updateById" parameterType="com.university.model.User">
+        UPDATE user
+        <set>
+            <if test="phone != null">phone = #{phone},</if>
+            <if test="email != null">email = #{email},</if>
+            <if test="targetScore != null">target_score = #{targetScore},</if>
+            <if test="avatarUrl != null">avatar_url = #{avatarUrl},</if>
+            <if test="targetUniversityId != null">target_university_id = #{targetUniversityId},</if>
+            <if test="infoUpdateTime != null">info_update_time = #{infoUpdateTime},</if>
+            <if test="password != null">password = #{password},</if>
+            <if test="undergraduateUniversityId != null">undergraduate_university_id = #{undergraduateUniversityId},</if>
+            <if test="postgraduateYear != null">postgraduate_year = #{postgraduateYear},</if>
+        </set>
+        WHERE id = #{id}
+    </update>
+    
+</mapper>

@@ -19,8 +19,15 @@ export default {
         },
         tertiary: '#EC4899',
         accent: '#7B61FF',
-        search: '#FF6B35',
-        data: '#10b981',
+        border: {
+          DEFAULT: '#E2E8F0',
+          color: '#E2E8F0',
+        },
+        text: {
+          primary: '#1A202C',
+          secondary: '#4A5568',
+        },
+        light: '#F8FAFC',
       },
       fontFamily: {
         sans: ['Microsoft YaHei', 'Arial', 'sans-serif'],

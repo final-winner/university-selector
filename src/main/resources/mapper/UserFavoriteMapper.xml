@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.university.mapper.UserFavoriteMapper">
+    
+    <resultMap id="BaseResultMap" type="com.university.model.UserFavorite">
+        <id column="id" property="id"/>
+        <result column="user_id" property="userId"/>
+        <result column="major_id" property="majorId"/>
+        <result column="collect_time" property="collectTime"/>
+        <result column="remark" property="remark"/>
+        <result column="university_id" property="universityId"/>
+    </resultMap>
+    
+    <select id="selectByUserId" resultMap="BaseResultMap">
+        SELECT * FROM favorite 
+        WHERE user_id = #{userId}
+        ORDER BY collect_time DESC
+    </select>
+    
+    <insert id="insert" parameterType="com.university.model.UserFavorite">
+        INSERT INTO favorite (user_id, university_id, major_id, collect_time, remark)
+        VALUES (#{userId}, #{universityId}, #{majorId}, NOW(), #{remark})
+    </insert>
+    
+    <delete id="deleteByUserIdAndUniversityId">
+        DELETE FROM favorite 
+        WHERE user_id = #{userId} AND university_id = #{universityId}
+    </delete>
+    
+    <select id="selectByUserIdAndUniversityId" resultMap="BaseResultMap">
+        SELECT * FROM favorite 
+        WHERE user_id = #{userId} AND university_id = #{universityId}
+    </select>
+    
+</mapper>

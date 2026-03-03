@@ -1,0 +1,103 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.university.mapper.UniversityMapper">
+    
+    <resultMap id="BaseResultMap" type="com.university.model.University">
+        <id column="id" property="id"/>
+        <result column="name" property="name"/>
+        <result column="address" property="address"/>
+        <result column="city" property="city"/>
+        <result column="code" property="code"/>
+        <result column="level" property="level"/>
+        <result column="official_website" property="officialWebsite"/>
+        <result column="graduate_school_name" property="graduateSchoolName"/>
+        <result column="graduate_school_website" property="graduateSchoolWebsite"/>
+        <result column="A_B" property="AB"/>
+        <result column="province" property="province"/>
+        <result column="introduction" property="introduction"/>
+        <result column="type" property="type"/>
+        <result column="logo_url" property="logoUrl"/>
+        <result column="region" property="region"/>
+        <result column="update_time" property="updateTime"/>
+    </resultMap>
+    
+    <select id="selectAll" resultMap="BaseResultMap">
+        SELECT * FROM university ORDER BY id
+    </select>
+    
+    <select id="selectById" resultMap="BaseResultMap">
+        SELECT * FROM university WHERE id = #{id}
+    </select>
+    
+    <select id="selectByProvince" resultMap="BaseResultMap">
+        SELECT * FROM university WHERE province = #{province} ORDER BY id
+    </select>
+    
+    <select id="selectByCity" resultMap="BaseResultMap">
+        SELECT * FROM university WHERE city = #{city} ORDER BY id
+    </select>
+    
+    <insert id="insert" parameterType="com.university.model.University" useGeneratedKeys="true" keyProperty="id">
+        INSERT INTO university (name, address, city, code, level, official_website, 
+            graduate_school_name, graduate_school_website, A_B, province, introduction, 
+            type, logo_url, region)
+        VALUES (#{name}, #{address}, #{city}, #{code}, #{level}, #{officialWebsite},
+            #{graduateSchoolName}, #{graduateSchoolWebsite}, #{AB}, #{province}, #{introduction},
+            #{type}, #{logoUrl}, #{region})
+    </insert>
+    
+    <update id="update" parameterType="com.university.model.University">
+        UPDATE university SET 
+            name = #{name}, address = #{address}, city = #{city}, code = #{code},
+            level = #{level}, official_website = #{officialWebsite}, 
+            graduate_school_name = #{graduateSchoolName}, graduate_school_website = #{graduateSchoolWebsite},
+            A_B = #{AB}, province = #{province}, introduction = #{introduction},
+            type = #{type}, logo_url = #{logoUrl}, region = #{region}
+        WHERE id = #{id}
+    </update>
+    
+    <delete id="deleteById">
+        DELETE FROM university WHERE id = #{id}
+    </delete>
+    
+    <resultMap id="CollegeResultMap" type="java.util.Map">
+        <result column="college_id" property="collegeId"/>
+        <result column="college_name" property="collegeName"/>
+        <result column="introduction" property="introduction"/>
+        <collection property="majorList" ofType="java.util.Map" javaType="java.util.List">
+            <result column="major_id" property="majorId"/>
+            <result column="major_name" property="majorName"/>
+            <collection property="scoreData" ofType="java.util.Map" javaType="java.util.List">
+                <result column="year" property="year"/>
+                <result column="reexamScore" property="reexamScore"/>
+                <result column="minScore" property="minScore"/>
+                <result column="maxScore" property="maxScore"/>
+                <result column="avgScore" property="avgScore"/>
+            </collection>
+        </collection>
+    </resultMap>
+    
+    <select id="getCollegesByUniversityId" resultMap="CollegeResultMap">
+        SELECT
+            d.id AS college_id,
+            d.name AS college_name,
+            d.introduction,
+            m.id AS major_id,
+            m.name AS major_name,
+            pd.year,
+            pd.retest_score AS reexamScore,
+            pd.lowest_score AS minScore,
+            pd.highest_score AS maxScore,
+            pd.average_score AS avgScore
+        FROM
+            department d
+        LEFT JOIN
+            major m ON d.id = m.department_id
+        LEFT JOIN
+            postgraduate_data pd ON m.id = pd.major_id
+        WHERE
+            d.university_id = #{universityId}
+        ORDER BY
+            d.name, m.name, pd.year
+    </select>
+</mapper>

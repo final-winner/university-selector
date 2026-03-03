@@ -35,8 +35,9 @@
               <input type="checkbox" v-model="loginForm.remember" />
               <span>记住我</span>
             </label>
-            <a href="#" class="forgot-password">忘记密码？</a>
+            <router-link to="/forgot-password" class="forgot-password">忘记密码？</router-link>
           </div>
+          <p v-if="errorMsg" class="error-text" style="color: #f97316; margin-bottom: 10px; font-weight: 600;">{{ errorMsg }}</p>
           <button type="submit" class="btn btn-primary">登录</button>
         </form>
         <div class="login-footer">
@@ -50,26 +51,59 @@
 <script>
 import { ref } from 'vue'
 import { useRouter } from 'vue-router'
+import { useAuth } from '@/composables/useAuth'
 
 export default {
   name: 'Login',
   setup() {
     const router = useRouter()
+    const { checkLoginStatus } = useAuth()
     const loginForm = ref({
       username: '',
       password: '',
       remember: false
     })
+    const errorMsg = ref('')
 
-    const handleLogin = () => {
-      console.log('登录信息:', loginForm.value)
-      alert('登录成功！')
-      router.push('/')
+    const handleLogin = async () => {
+      errorMsg.value = ''
+      try {
+        const response = await fetch('http://localhost:8080/user/login', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({
+            username: loginForm.value.username,
+            password: loginForm.value.password
+          })
+        })
+        const data = await response.json()
+        if (data.success) {
+          localStorage.setItem('user', JSON.stringify(data.user))
+          checkLoginStatus()
+          window.$showToast({
+            title: '登录成功',
+            message: '欢迎回来！',
+            type: 'success'
+          })
+          setTimeout(() => {
+            router.push('/').then(() => {
+              window.location.reload()
+            })
+          }, 1000)
+        } else {
+          errorMsg.value = data.message || '登录失败'
+        }
+      } catch (error) {
+        errorMsg.value = '网络错误，请稍后重试'
+      }
     }
 
     return {
       loginForm,
-      handleLogin
+      handleLogin,
+      errorMsg
     }
   }
 }
@@ -306,6 +340,7 @@ export default {
 .forgot-password {
   color: #ff7d00;
   text-decoration: none;
+  font-weight: 600;
   font-size: 0.9rem;
   transition: all 0.3s ease;
 }

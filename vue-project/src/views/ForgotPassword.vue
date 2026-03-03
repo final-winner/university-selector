@@ -1,22 +1,22 @@
 <template>
-  <div class="register">
-    <div class="register-bg-orb"></div>
-    <div class="register-bg-orb"></div>
-    <div class="register-bg-orb"></div>
-    <div class="register-bg-orb"></div>
-    <div class="register-bg-orb"></div>
-    <div class="register-container">
-      <div class="register-card">
-        <div class="register-header">
-          <h1>用户注册</h1>
-          <p>加入408考研择校辅助系统</p>
+  <div class="login">
+    <div class="login-bg-orb"></div>
+    <div class="login-bg-orb"></div>
+    <div class="login-bg-orb"></div>
+    <div class="login-bg-orb"></div>
+    <div class="login-bg-orb"></div>
+    <div class="login-container">
+      <div class="login-card">
+        <div class="login-header">
+          <h1>找回密码</h1>
+          <p>请输入您的用户名和邮箱</p>
         </div>
-        <form @submit.prevent="handleRegister">
+        <form @submit.prevent="handleSubmit">
           <div class="form-group">
             <label>用户名</label>
             <input
               type="text"
-              v-model="registerForm.username"
+              v-model="form.username"
               placeholder="请输入用户名"
               required
             />
@@ -25,50 +25,17 @@
             <label>邮箱</label>
             <input
               type="email"
-              v-model="registerForm.email"
+              v-model="form.email"
               placeholder="请输入邮箱"
               required
             />
           </div>
-          <div class="form-group">
-            <label>手机号</label>
-            <input
-              type="tel"
-              v-model="registerForm.phone"
-              placeholder="请输入手机号"
-              pattern="^1[3-9]\d{9}$"
-              required
-            />
-          </div>
-          <div class="form-group">
-            <label>密码</label>
-            <input
-              type="password"
-              v-model="registerForm.password"
-              placeholder="请输入密码"
-              required
-            />
-          </div>
-          <div class="form-group">
-            <label>确认密码</label>
-            <input
-              type="password"
-              v-model="registerForm.confirmPassword"
-              placeholder="请再次输入密码"
-              required
-            />
-          </div>
-          <div class="form-group">
-            <label class="checkbox-label">
-              <input type="checkbox" v-model="registerForm.agree" required />
-              <span>我已阅读并同意<a href="#" class="terms-link">用户协议</a>和<a href="#" class="terms-link">隐私政策</a></span>
-            </label>
-          </div>
           <p v-if="errorMsg" class="error-text" style="color: #f97316; margin-bottom: 10px; font-weight: 600;">{{ errorMsg }}</p>
-          <button type="submit" class="btn btn-primary">注册</button>
+          <p v-if="successMsg" class="success-text" style="color: #16a34a; margin-bottom: 10px;">{{ successMsg }}</p>
+          <button type="submit" class="btn btn-primary">发送验证码</button>
         </form>
-        <div class="register-footer">
-          <p>已有账号？<router-link to="/login">立即登录</router-link></p>
+        <div class="login-footer">
+          <p>记起密码了？<router-link to="/login">立即登录</router-link></p>
         </div>
       </div>
     </div>
@@ -80,54 +47,41 @@ import { ref } from 'vue'
 import { useRouter } from 'vue-router'
 
 export default {
-  name: 'Register',
+  name: 'ForgotPassword',
   setup() {
     const router = useRouter()
-    const registerForm = ref({
+    const form = ref({
       username: '',
-      email: '',
-      phone: '',
-      password: '',
-      confirmPassword: '',
-      agree: false
+      email: ''
     })
     const errorMsg = ref('')
+    const successMsg = ref('')
 
-    const handleRegister = async () => {
-      if (registerForm.value.password !== registerForm.value.confirmPassword) {
-        errorMsg.value = '两次输入的密码不一致'
-        return
-      }
-      if (!registerForm.value.agree) {
-        errorMsg.value = '请同意用户协议'
-        return
-      }
+    const handleSubmit = async () => {
       errorMsg.value = ''
+      successMsg.value = ''
+      
+      if (!form.value.username || !form.value.email) {
+        errorMsg.value = '请填写完整信息'
+        return
+      }
+
       try {
-        const response = await fetch('http://localhost:8080/user/register', {
+        const response = await fetch('http://localhost:8080/user/reset-password', {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json'
           },
           body: JSON.stringify({
-            username: registerForm.value.username,
-            password: registerForm.value.password,
-            email: registerForm.value.email,
-            phone: registerForm.value.phone
+            username: form.value.username,
+            email: form.value.email
           })
         })
         const data = await response.json()
         if (data.success) {
-          window.$showToast({
-            title: '注册成功',
-            message: '欢迎加入！请登录',
-            type: 'success'
-          })
-          setTimeout(() => {
-            router.push('/login')
-          }, 1000)
+          successMsg.value = '验证码已发送到您的邮箱'
         } else {
-          errorMsg.value = data.message || '注册失败'
+          errorMsg.value = data.message || '用户信息不匹配'
         }
       } catch (error) {
         errorMsg.value = '网络错误，请稍后重试'
@@ -135,16 +89,17 @@ export default {
     }
 
     return {
-      registerForm,
-      handleRegister,
-      errorMsg
+      form,
+      handleSubmit,
+      errorMsg,
+      successMsg
     }
   }
 }
 </script>
 
 <style scoped>
-.register {
+.login {
   min-height: 100vh;
   display: flex;
   align-items: center;
@@ -155,7 +110,7 @@ export default {
   overflow: hidden;
 }
 
-.register::after {
+.login::after {
   content: '';
   position: absolute;
   top: -50%;
@@ -177,7 +132,7 @@ export default {
   }
 }
 
-.register-bg-orb {
+.login-bg-orb {
   position: absolute;
   border-radius: 50%;
   filter: blur(40px);
@@ -185,7 +140,7 @@ export default {
   animation: float 15s ease-in-out infinite;
 }
 
-.register-bg-orb:nth-child(1) {
+.login-bg-orb:nth-child(1) {
   width: 400px;
   height: 400px;
   background: radial-gradient(circle, rgba(255, 107, 53, 0.4) 0%, transparent 70%);
@@ -194,7 +149,7 @@ export default {
   animation-delay: 0s;
 }
 
-.register-bg-orb:nth-child(2) {
+.login-bg-orb:nth-child(2) {
   width: 350px;
   height: 350px;
   background: radial-gradient(circle, rgba(59, 130, 246, 0.4) 0%, transparent 70%);
@@ -203,7 +158,7 @@ export default {
   animation-delay: -5s;
 }
 
-.register-bg-orb:nth-child(3) {
+.login-bg-orb:nth-child(3) {
   width: 300px;
   height: 300px;
   background: radial-gradient(circle, rgba(123, 97, 255, 0.4) 0%, transparent 70%);
@@ -213,7 +168,7 @@ export default {
   animation-delay: -10s;
 }
 
-.register-bg-orb:nth-child(4) {
+.login-bg-orb:nth-child(4) {
   width: 250px;
   height: 250px;
   background: radial-gradient(circle, rgba(0, 196, 140, 0.3) 0%, transparent 70%);
@@ -222,7 +177,7 @@ export default {
   animation-delay: -3s;
 }
 
-.register-bg-orb:nth-child(5) {
+.login-bg-orb:nth-child(5) {
   width: 280px;
   height: 280px;
   background: radial-gradient(circle, rgba(255, 177, 66, 0.3) 0%, transparent 70%);
@@ -246,24 +201,24 @@ export default {
   }
 }
 
-.register-container {
+.login-container {
   width: 100%;
   max-width: 420px;
   position: relative;
   z-index: 1;
 }
 
-.register-card {
+.login-card {
   background: white;
   border-radius: 20px;
-  padding: 30px;
+  padding: 45px;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
   border: 2px solid #e6f0ff;
   position: relative;
   overflow: hidden;
 }
 
-.register-card::before {
+.login-card::before {
   content: '';
   position: absolute;
   top: 0;
@@ -272,6 +227,17 @@ export default {
   height: 3px;
   background: linear-gradient(90deg, transparent, #ff7d00, transparent);
   animation: shimmer 3s linear infinite;
+}
+
+.login-card::after {
+  content: '';
+  position: absolute;
+  top: -50%;
+  right: -50%;
+  width: 100%;
+  height: 100%;
+  background: radial-gradient(circle, rgba(255, 125, 0, 0.08) 0%, transparent 70%);
+  pointer-events: none;
 }
 
 @keyframes shimmer {
@@ -283,23 +249,12 @@ export default {
   }
 }
 
-.register-card::after {
-  content: '';
-  position: absolute;
-  top: -50%;
-  right: -50%;
-  width: 100%;
-  height: 100%;
-  background: radial-gradient(circle, rgba(255, 125, 0, 0.08) 0%, transparent 70%);
-  pointer-events: none;
-}
-
-.register-header {
+.login-header {
   text-align: center;
   margin-bottom: 35px;
 }
 
-.register-header h1 {
+.login-header h1 {
   font-size: 2.2rem;
   font-weight: 700;
   color: #1a365d;
@@ -307,7 +262,7 @@ export default {
   letter-spacing: 2px;
 }
 
-.register-header p {
+.login-header p {
   color: #889099;
   font-size: 0.95rem;
   letter-spacing: 1px;
@@ -326,10 +281,7 @@ export default {
   letter-spacing: 0.5px;
 }
 
-.form-group input[type="text"],
-.form-group input[type="email"],
-.form-group input[type="password"],
-.form-group input[type="tel"] {
+.form-group input {
   width: 100%;
   padding: 14px 18px;
   border: 2px solid #e6f0ff;
@@ -340,56 +292,15 @@ export default {
   color: #1a365d;
 }
 
-.form-group input[type="text"]::placeholder,
-.form-group input[type="email"]::placeholder,
-.form-group input[type="password"]::placeholder,
-.form-group input[type="tel"]::placeholder {
+.form-group input::placeholder {
   color: #889099;
 }
 
-.form-group input[type="text"]:focus,
-.form-group input[type="email"]:focus,
-.form-group input[type="password"]:focus,
-.form-group input[type="tel"]:focus {
+.form-group input:focus {
   outline: none;
   border-color: #ff7d00;
   box-shadow: 0 0 0 3px rgba(255, 125, 0, 0.1);
   background: white;
-}
-
-.form-options {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 28px;
-}
-
-.checkbox-label {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  cursor: pointer;
-  font-size: 0.9rem;
-  color: #889099;
-}
-
-.checkbox-label input {
-  width: 18px;
-  height: 18px;
-  cursor: pointer;
-  accent-color: #ff7d00;
-  margin-right: 12px;
-}
-
-.terms-link {
-  color: #ff7d00;
-  text-decoration: none;
-  transition: all 0.3s ease;
-}
-
-.terms-link:hover {
-  color: #e67300;
-  text-decoration: none;
 }
 
 .btn {
@@ -433,37 +344,37 @@ export default {
   box-shadow: 0 6px 20px rgba(30, 58, 138, 0.4);
 }
 
-.register-footer {
+.login-footer {
   text-align: center;
   margin-top: 28px;
   padding-top: 24px;
   border-top: 1px solid #e6f0ff;
 }
 
-.register-footer p {
+.login-footer p {
   color: #889099;
   font-size: 0.9rem;
   margin: 0;
 }
 
-.register-footer a {
+.login-footer a {
   color: #ff7d00;
   text-decoration: none;
   font-weight: 600;
   transition: all 0.3s ease;
 }
 
-.register-footer a:hover {
+.login-footer a:hover {
   color: #e67300;
   text-decoration: none;
 }
 
 @media (max-width: 480px) {
-  .register-card {
+  .login-card {
     padding: 35px 25px;
   }
 
-  .register-header h1 {
+  .login-header h1 {
     font-size: 1.8rem;
   }
 }

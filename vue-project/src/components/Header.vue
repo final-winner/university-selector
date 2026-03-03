@@ -2,51 +2,54 @@
   <header class="navbar">
     <div class="w-100 px-4">
       <div class="d-flex justify-content-between align-items-center w-100">
-        <!-- 左侧：Logo 和导航链接 -->
         <div class="d-flex items-center">
-          <!-- Logo -->
           <div class="navbar-brand" style="margin-left: 0;">
             <img src="/image/408.png" alt="408教父" class="img-fluid" style="height: 56px;">
           </div>
           
-          <!-- 桌面端导航链接 -->
           <ul class="d-none d-md-flex ml-8 list-none">
             <li class="list-item">
               <router-link class="nav-link" to="/" @click="closeNavbar">
-                <Home class="h-4 w-4 mr-2" />
+                <Home class="h-3 w-3 mr-2" />
                 首页
               </router-link>
             </li>
             <li class="list-item">
               <router-link class="nav-link" to="/university-list" @click="closeNavbar">
-                <List class="h-4 w-4 mr-2" />
+                <List class="h-3 w-3 mr-2" />
                 院校列表
               </router-link>
             </li>
             <li class="list-item">
-              <router-link class="nav-link" to="/recommend" @click="closeNavbar">
-                <Lightbulb class="h-4 w-4 mr-2" />
+              <a class="nav-link" href="javascript:void(0)" @click="handleAuthNavigate('/recommend', true)">
+                <Lightbulb class="h-3 w-3 mr-2" />
                 智能推荐
-              </router-link>
+              </a>
             </li>
             <li class="list-item">
-              <router-link class="nav-link" to="/compare" @click="closeNavbar">
-                <BarChart class="h-4 w-4 mr-2" />
+              <a class="nav-link" href="javascript:void(0)" @click="handleAuthNavigate('/compare', true)">
+                <BarChart class="h-3 w-3 mr-2" />
                 数据对比
-              </router-link>
+              </a>
             </li>
           </ul>
         </div>
         
-        <!-- 右侧：登录注册按钮和移动端菜单 -->
         <div class="d-flex items-center">
-          <!-- 桌面端登录注册按钮 -->
-          <div class="d-none d-md-flex">
-            <router-link to="/login" class="btn btn-outline-secondary btn-lg mr-4" @click="closeNavbar">登录</router-link>
-            <router-link to="/register" class="btn btn-primary btn-lg" @click="closeNavbar">注册</router-link>
+          <div class="d-none d-md-flex align-items-center">
+            <template v-if="isLoggedIn">
+              <router-link to="/profile" class="d-flex align-items-center mr-4 user-info">
+                <User class="h-3 w-3 mr-2" />
+                {{ user?.username }}
+              </router-link>
+              <button class="btn btn-logout btn-lg" @click="handleLogout">退出</button>
+            </template>
+            <template v-else>
+              <router-link to="/login" class="btn btn-lg mr-4" @click="closeNavbar">登录</router-link>
+              <router-link to="/register" class="btn btn-primary btn-lg" @click="closeNavbar">注册</router-link>
+            </template>
           </div>
           
-          <!-- 移动端菜单按钮 -->
           <div class="d-md-none flex items-center">
             <button @click="toggleNavbar" class="p-2 rounded-md text-gray-600">
               <Menu class="h-6 w-6" />
@@ -55,37 +58,45 @@
         </div>
       </div>
       
-      <!-- 移动端菜单 -->
       <div v-if="isNavbarOpen" class="d-md-none py-4 space-y-3">
         <ul class="space-y-3">
           <li>
             <router-link class="nav-link" to="/" @click="closeNavbar">
-              <Home class="h-4 w-4 mr-2" />
+              <Home class="h-3 w-3 mr-2" />
               首页
             </router-link>
           </li>
           <li>
             <router-link class="nav-link" to="/university-list" @click="closeNavbar">
-              <List class="h-4 w-4 mr-2" />
+              <List class="h-3 w-3 mr-2" />
               院校列表
             </router-link>
           </li>
           <li>
-            <router-link class="nav-link" to="/recommend" @click="closeNavbar">
-              <Lightbulb class="h-4 w-4 mr-2" />
+            <a class="nav-link" href="javascript:void(0)" @click="handleAuthNavigate('/recommend', true)">
+              <Lightbulb class="h-3 w-3 mr-2" />
               智能推荐
-            </router-link>
+            </a>
           </li>
           <li>
-            <router-link class="nav-link" to="/compare" @click="closeNavbar">
-              <BarChart class="h-4 w-4 mr-2" />
+            <a class="nav-link" href="javascript:void(0)" @click="handleAuthNavigate('/compare', true)">
+              <BarChart class="h-3 w-3 mr-2" />
               数据对比
-            </router-link>
+            </a>
           </li>
         </ul>
         <div class="d-flex flex-column gap-3 mt-4">
-          <router-link to="/login" class="btn text-center" @click="closeNavbar">登录</router-link>
-          <router-link to="/register" class="btn btn-primary text-center" @click="closeNavbar">注册</router-link>
+          <template v-if="isLoggedIn">
+            <router-link to="/profile" class="d-flex align-items-center justify-content-center user-info">
+              <User class="h-3 w-3 mr-2" />
+              {{ user?.username }}
+            </router-link>
+            <button class="btn btn-logout text-center" @click="handleLogout">退出</button>
+          </template>
+          <template v-else>
+            <router-link to="/login" class="btn text-center" @click="closeNavbar">登录</router-link>
+            <router-link to="/register" class="btn btn-primary text-center" @click="closeNavbar">注册</router-link>
+          </template>
         </div>
       </div>
     </div>
@@ -93,8 +104,10 @@
 </template>
 
 <script>
-import { ref } from 'vue'
-import { Home, List, Lightbulb, BarChart, Menu } from 'lucide-vue-next'
+import { ref, onMounted } from 'vue'
+import { Home, List, Lightbulb, BarChart, Menu, User } from 'lucide-vue-next'
+import { useRouter } from 'vue-router'
+import { useAuth } from '@/composables/useAuth'
 
 export default {
   name: 'Header',
@@ -103,29 +116,74 @@ export default {
     List,
     Lightbulb,
     BarChart,
-    Menu
+    Menu,
+    User
   },
   setup() {
+    const router = useRouter()
+    const { isLoggedIn, user, checkLoginStatus, logout, handleNavigate } = useAuth()
     const isNavbarOpen = ref(false)
 
+    /**
+     * 处理需要认证的导航
+     * @param {string} to - 目标路由
+     * @param {boolean} requireAuth - 是否需要登录
+     */
+    const handleAuthNavigate = (to, requireAuth) => {
+      if (requireAuth) {
+        handleNavigate(to, true)
+      } else {
+        closeNavbar()
+        router.push(to)
+      }
+    }
+
+    /**
+     * 处理退出登录
+     */
+    const handleLogout = () => {
+      logout()
+      window.location.reload()
+    }
+
+    /**
+     * 切换导航栏状态
+     */
     const toggleNavbar = () => {
       isNavbarOpen.value = !isNavbarOpen.value
     }
 
+    /**
+     * 关闭导航栏
+     */
     const closeNavbar = () => {
       isNavbarOpen.value = false
     }
 
+    onMounted(() => {
+      checkLoginStatus()
+    })
+
     return {
       isNavbarOpen,
+      isLoggedIn,
+      user,
       toggleNavbar,
-      closeNavbar
+      closeNavbar,
+      handleLogout,
+      handleAuthNavigate,
+      checkLoginStatus
     }
   }
 }
 </script>
 
 <style scoped>
+.user-info {
+  color: #1a365d;
+  font-weight: 600;
+}
+
 .text-gray-600 {
   color: var(--text-secondary);
 }

@@ -7,6 +7,8 @@ import java.time.LocalDateTime;
 public class UserFavorite {
     private Integer id;
     private Integer userId;
+    private Integer majorId;
+    private LocalDateTime collectTime;
+    private String remark;
     private Integer universityId;
-    private LocalDateTime createdAt;
 }

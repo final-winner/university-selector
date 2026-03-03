@@ -7,11 +7,18 @@ import java.time.LocalDateTime;
 public class UniversityMajor {
     private Integer id;
     private Integer universityId;
-    private String majorName;
+    private String name;
+    private String code;
+    private String department;
+    private String rating;
+    private String tuition;
+    private String introduction;
     private String examSubjects;
-    private String researchDirection;
-    private String tutorInfo;
-    private String disciplineEvaluation;
-    private LocalDateTime createdAt;
-    private LocalDateTime updatedAt;
+    private String retestSubjects;
+    private String schoolingLength;
+    private String acceptTransfer;
+    private String masterType;
+    private String dormitory;
+    private String employment;
+    private LocalDateTime updateTime;
 }

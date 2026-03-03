@@ -5,18 +5,21 @@
       <router-view />
     </main>
     <Footer />
+    <Toast />
   </div>
 </template>
 
 <script>
 import Header from '@/components/Header.vue'
 import Footer from '@/components/Footer.vue'
+import Toast from '@/components/Toast.vue'
 
 export default {
   name: 'App',
   components: {
     Header,
-    Footer
+    Footer,
+    Toast
   }
 }
 </script>
