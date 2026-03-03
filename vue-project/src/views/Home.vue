@@ -75,11 +75,14 @@
             </div>
             <div class="card-footer">
               <a href="javascript:void(0)" @click="handleNavigate(`/university-detail/${university.id}`)" class="btn btn-primary text-xs font-bold px-2 py-1 hover:shadow-lg transform hover:-translate-y-1 transition-all">查看详情</a>
-              <button class="btn btn-favorite hover:shadow-lg transform hover:-translate-y-1 transition-all" @click="toggleFavorite(university.id)" :class="isFavorite(university.id) ? 'active' : ''">
-                <span :class="isFavorite(university.id) ? 'text-red-500' : 'text-gray-300'" style="font-size: 16px;">
-                  {{ isFavorite(university.id) ? '❤' : '♡' }}
-                </span>
-              </button>
+              <div class="flex items-center gap-4">
+                <span class="collection-count text-sm text-text-secondary">收藏: {{ university.collectionNum }}</span>
+                <button class="btn btn-favorite hover:shadow-lg transform hover:-translate-y-1 transition-all" @click="toggleFavorite(university.id)" :class="isFavorite(university.id) ? 'active' : ''">
+                  <span :class="isFavorite(university.id) ? 'text-red-500' : 'text-gray-300'" style="font-size: 16px;">
+                    {{ isFavorite(university.id) ? '❤' : '♡' }}
+                  </span>
+                </button>
+              </div>
             </div>
           </div>
         </div>
@@ -147,6 +150,21 @@ export default {
           const newFavorites = new Set(favorites.value)
           isFav ? newFavorites.delete(id) : newFavorites.add(id)
           favorites.value = newFavorites
+          
+          // 实时更新收藏量
+          const universityIndex = universities.value.findIndex(uni => uni.id === id)
+          if (universityIndex !== -1) {
+            // 创建新的数组来触发响应式更新
+            const updatedUniversities = [...universities.value]
+            // 更新收藏量
+            updatedUniversities[universityIndex] = {
+              ...updatedUniversities[universityIndex],
+              collectionNum: isFav 
+                ? Math.max(0, updatedUniversities[universityIndex].collectionNum - 1) 
+                : updatedUniversities[universityIndex].collectionNum + 1
+            }
+            universities.value = updatedUniversities
+          }
         } else {
           // 修复：当后端返回"已收藏"时，自动添加到收藏列表
           if (response.message.includes('已收藏') && !isFav) {
@@ -332,7 +350,10 @@ export default {
   align-items: center;
 }
 
-
+.collection-count {
+  font-size: 0.875rem;
+  color: var(--text-secondary);
+}
 
 @media (max-width: 768px) {
   .col-md-3,

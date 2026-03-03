@@ -320,6 +320,16 @@ const toggleFavorite = async () => {
     if (data.success) {
       // 直接更新响应式数据
       isFavorited.value = !isFavorited.value
+      
+      // 实时更新收藏量
+      if (university.value && university.value.collectionNum !== undefined) {
+        university.value = {
+          ...university.value,
+          collectionNum: isFavorited.value 
+            ? university.value.collectionNum + 1 
+            : Math.max(0, university.value.collectionNum - 1)
+        }
+      }
     } else {
       // 修复：当后端返回"已收藏"时，自动设置为已收藏状态
       if (data.message.includes('已收藏') && !isFavorited.value) {
