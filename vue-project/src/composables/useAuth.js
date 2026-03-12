@@ -67,6 +67,7 @@ export function useAuth() {
       isLoading.value = true
       const response = await userApi.login(credentials)
       if (response.success) {
+        console.log('Login response user:', response.user)
         localStorage.setItem('user', JSON.stringify(response.user))
         checkLoginStatus()
       }

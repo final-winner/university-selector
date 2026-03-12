@@ -11,11 +11,39 @@
  Target Server Version : 80044 (8.0.44)
  File Encoding         : 65001
 
- Date: 04/03/2026 01:09:42
+ Date: 12/03/2026 10:20:24
 */
 
 SET NAMES utf8mb4;
 SET FOREIGN_KEY_CHECKS = 0;
+
+-- ----------------------------
+-- Table structure for correction
+-- ----------------------------
+DROP TABLE IF EXISTS `correction`;
+CREATE TABLE `correction`  (
+                               `id` int NOT NULL AUTO_INCREMENT COMMENT '纠错信息唯一标识',
+                               `user_id` int NOT NULL COMMENT '用户id',
+                               `university_id` int NOT NULL COMMENT '院校id',
+                               `type` varchar(20) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL COMMENT '纠错类型（university/department/major/score）',
+                               `field` varchar(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL COMMENT '纠错字段',
+                               `current_value` varchar(500) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NULL DEFAULT NULL COMMENT '当前值',
+                               `suggested_value` varchar(500) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL COMMENT '建议值',
+                               `description` text CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NULL COMMENT '备注说明',
+                               `status` enum('pending','approved','rejected') CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL DEFAULT 'pending' COMMENT '状态（待审核/已通过/已拒绝）',
+                               `submit_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '提交时间',
+                               `process_time` datetime NULL DEFAULT NULL COMMENT '处理时间',
+                               PRIMARY KEY (`id`) USING BTREE,
+                               INDEX `idx_user_id`(`user_id` ASC) USING BTREE,
+                               INDEX `idx_university_id`(`university_id` ASC) USING BTREE,
+                               INDEX `idx_status`(`status` ASC) USING BTREE,
+                               CONSTRAINT `fk_correction_university` FOREIGN KEY (`university_id`) REFERENCES `university` (`id`) ON DELETE CASCADE ON UPDATE CASCADE,
+                               CONSTRAINT `fk_correction_user` FOREIGN KEY (`user_id`) REFERENCES `user` (`id`) ON DELETE CASCADE ON UPDATE CASCADE
+) ENGINE = InnoDB AUTO_INCREMENT = 1 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci COMMENT = '数据纠错表' ROW_FORMAT = DYNAMIC;
+
+-- ----------------------------
+-- Records of correction
+-- ----------------------------
 
 -- ----------------------------
 -- Table structure for department
@@ -110,11 +138,17 @@ CREATE TABLE `favorite`  (
                              CONSTRAINT `favorite_ibfk_1` FOREIGN KEY (`user_id`) REFERENCES `user` (`id`) ON DELETE CASCADE ON UPDATE CASCADE,
                              CONSTRAINT `favorite_ibfk_2` FOREIGN KEY (`major_id`) REFERENCES `major` (`id`) ON DELETE CASCADE ON UPDATE CASCADE,
                              CONSTRAINT `favorite_ibfk_3` FOREIGN KEY (`university_id`) REFERENCES `university` (`id`) ON DELETE CASCADE ON UPDATE CASCADE
-) ENGINE = InnoDB AUTO_INCREMENT = 99 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci COMMENT = '用户收藏表（支持收藏专业/院校）' ROW_FORMAT = DYNAMIC;
+) ENGINE = InnoDB AUTO_INCREMENT = 137 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci COMMENT = '用户收藏表（支持收藏专业/院校）' ROW_FORMAT = DYNAMIC;
 
 -- ----------------------------
 -- Records of favorite
 -- ----------------------------
+INSERT INTO `favorite` VALUES (122, 2, NULL, '2026-03-04 01:56:59', NULL, 1);
+INSERT INTO `favorite` VALUES (123, 1, NULL, '2026-03-04 01:58:05', NULL, 1);
+INSERT INTO `favorite` VALUES (125, 1, NULL, '2026-03-04 01:58:10', NULL, 6);
+INSERT INTO `favorite` VALUES (126, 2, NULL, '2026-03-04 01:58:35', NULL, 2);
+INSERT INTO `favorite` VALUES (128, 3, NULL, '2026-03-04 02:00:15', NULL, 2);
+INSERT INTO `favorite` VALUES (131, 3, NULL, '2026-03-04 02:18:57', NULL, 1);
 
 -- ----------------------------
 -- Table structure for major
@@ -251,12 +285,12 @@ CREATE TABLE `university`  (
 -- ----------------------------
 -- Records of university
 -- ----------------------------
-INSERT INTO `university` VALUES (1, '清华大学', 0, '北京市海淀区清华园1号', '北京', '10003', 'C9', 'https://www.tsinghua.edu.cn/', '清华大学研究生院', 'https://yz.tsinghua.edu.cn/', 'A区', '北京', '清华大学始建于1911年，是中国著名高等学府，坐落于北京清华园。作为顶尖研究型大学，拥有12个学科门类，在工程技术、计算机科学、经济管理等领域享誉世界。', '综合类', 'https://www.tsinghua.edu.cn/images/logo.png', '华北', '2026-03-04 01:07:50');
-INSERT INTO `university` VALUES (2, '北京大学', 0, '北京市海淀区颐和园路5号', '北京', '10001', 'C9', 'https://www.pku.edu.cn/', '北京大学研究生院', 'https://grs.pku.edu.cn/', 'A区', '北京', '北京大学创办于1898年，初名京师大学堂，是中国第一所国立综合性大学。拥有强大的文理医工学科群，人文社科和自然科学均处于国内领先地位。', '综合类', 'https://www.pku.edu.cn/img/logo.png', '华北', '2026-03-04 01:07:51');
-INSERT INTO `university` VALUES (3, '中国人民大学', 0, '北京市海淀区中关村大街59号', '北京', '10002', '985', 'https://www.ruc.edu.cn/', '中国人民大学研究生院', 'https://grs.ruc.edu.cn/', 'A区', '北京', '中国人民大学是中国共产党创办的第一所新型正规大学，以人文社会科学著称，被誉为\"中国人文社会科学的一面旗帜\"。', '综合类', 'https://www.ruc.edu.cn/logo.png', '华北', '2026-02-20 00:38:37');
-INSERT INTO `university` VALUES (4, '北京航空航天大学', 0, '北京市海淀区学院路37号', '北京', '10006', '985', 'https://www.buaa.edu.cn/', '北京航空航天大学研究生院', 'https://graduate.buaa.edu.cn/', 'A区', '北京', '北京航空航天大学成立于1952年，是新中国的第一所航空航天高等学府，以航空航天、信息技术为特色，工科优势突出。', '理工类', 'https://www.buaa.edu.cn/logo.png', '华北', '2026-02-20 00:38:37');
-INSERT INTO `university` VALUES (5, '北京理工大学', 0, '北京市海淀区中关村南大街5号', '北京', '10007', '985', 'https://www.bit.edu.cn/', '北京理工大学研究生院', 'https://grd.bit.edu.cn/', 'A区', '北京', '北京理工大学是中国共产党创办的第一所理工科大学，以国防科技为特色，在兵器科学与技术、车辆工程等领域具有显著优势。', '理工类', 'https://www.bit.edu.cn/logo.png', '华北', '2026-03-04 01:07:51');
-INSERT INTO `university` VALUES (6, '中国农业大学', 0, '北京市海淀区清华东路17号', '北京', '10019', '985', 'https://www.cau.edu.cn/', '中国农业大学研究生院', 'https://grad.cau.edu.cn/', 'A区', '北京', '中国农业大学是我国现代农业高等教育的起源地，以农业生命科学、农业工程为特色，农业科学领域位居全国首位。', '农林类', 'https://www.cau.edu.cn/logo.png', '华北', '2026-02-20 00:38:37');
+INSERT INTO `university` VALUES (1, '清华大学', 3, '北京市海淀区清华园1号', '北京', '10003', 'C9', 'https://www.tsinghua.edu.cn/', '清华大学研究生院', 'https://yz.tsinghua.edu.cn/', 'A区', '北京', '清华大学始建于1911年，是中国著名高等学府，坐落于北京清华园。作为顶尖研究型大学，拥有12个学科门类，在工程技术、计算机科学、经济管理等领域享誉世界。', '综合类', 'https://www.tsinghua.edu.cn/images/logo.png', '华北', '2026-03-04 02:18:57');
+INSERT INTO `university` VALUES (2, '北京大学', 2, '北京市海淀区颐和园路5号', '北京', '10001', 'C9', 'https://www.pku.edu.cn/', '北京大学研究生院', 'https://grs.pku.edu.cn/', 'A区', '北京', '北京大学创办于1898年，初名京师大学堂，是中国第一所国立综合性大学。拥有强大的文理医工学科群，人文社科和自然科学均处于国内领先地位。', '综合类', 'https://www.pku.edu.cn/img/logo.png', '华北', '2026-03-04 02:00:15');
+INSERT INTO `university` VALUES (3, '中国人民大学', 0, '北京市海淀区中关村大街59号', '北京', '10002', '985', 'https://www.ruc.edu.cn/', '中国人民大学研究生院', 'https://grs.ruc.edu.cn/', 'A区', '北京', '中国人民大学是中国共产党创办的第一所新型正规大学，以人文社会科学著称，被誉为\"中国人文社会科学的一面旗帜\"。', '综合类', 'https://www.ruc.edu.cn/logo.png', '华北', '2026-03-04 02:19:52');
+INSERT INTO `university` VALUES (4, '北京航空航天大学', 0, '北京市海淀区学院路37号', '北京', '10006', '985', 'https://www.buaa.edu.cn/', '北京航空航天大学研究生院', 'https://graduate.buaa.edu.cn/', 'A区', '北京', '北京航空航天大学成立于1952年，是新中国的第一所航空航天高等学府，以航空航天、信息技术为特色，工科优势突出。', '理工类', 'https://www.buaa.edu.cn/logo.png', '华北', '2026-03-04 01:49:27');
+INSERT INTO `university` VALUES (5, '北京理工大学', 0, '北京市海淀区中关村南大街5号', '北京', '10007', '985', 'https://www.bit.edu.cn/', '北京理工大学研究生院', 'https://grd.bit.edu.cn/', 'A区', '北京', '北京理工大学是中国共产党创办的第一所理工科大学，以国防科技为特色，在兵器科学与技术、车辆工程等领域具有显著优势。', '理工类', 'https://www.bit.edu.cn/logo.png', '华北', '2026-03-04 02:21:13');
+INSERT INTO `university` VALUES (6, '中国农业大学', 1, '北京市海淀区清华东路17号', '北京', '10019', '985', 'https://www.cau.edu.cn/', '中国农业大学研究生院', 'https://grad.cau.edu.cn/', 'A区', '北京', '中国农业大学是我国现代农业高等教育的起源地，以农业生命科学、农业工程为特色，农业科学领域位居全国首位。', '农林类', 'https://www.cau.edu.cn/logo.png', '华北', '2026-03-04 02:20:35');
 INSERT INTO `university` VALUES (7, '北京师范大学', 0, '北京市海淀区新街口外大街19号', '北京', '10027', '985', 'https://www.bnu.edu.cn/', '北京师范大学研究生院', 'https://graduate.bnu.edu.cn/', 'A区', '北京', '北京师范大学是教育部直属重点大学，以教师教育、教育科学和文理基础学科为主要特色，是中国师范教育的排头兵。', '师范类', 'https://www.bnu.edu.cn/logo.png', '华北', '2026-02-20 00:38:37');
 INSERT INTO `university` VALUES (8, '中央民族大学', 0, '北京市海淀区中关村南大街27号', '北京', '10052', '985', 'https://www.muc.edu.cn/', '中央民族大学研究生院', 'https://grs.muc.edu.cn/', 'A区', '北京', '中央民族大学是中国少数民族教育的最高学府，拥有民族学、社会学等特色学科，为少数民族和民族地区培养人才。', '民族类', 'https://www.muc.edu.cn/logo.png', '华北', '2026-02-20 00:38:37');
 INSERT INTO `university` VALUES (9, '复旦大学', 0, '上海市杨浦区邯郸路220号', '上海', '10246', 'C9', 'https://www.fudan.edu.cn/', '复旦大学研究生院', 'https://gs.fudan.edu.cn/', 'A区', '上海', '复旦大学创建于1905年，原名复旦公学，是中国人自主创办的第一所高等院校。文理医工均衡发展，新闻、经济、医学等学科享誉海内外。', '综合类', 'https://www.fudan.edu.cn/logo.png', '华东', '2026-02-20 12:09:34');
@@ -552,7 +586,8 @@ CREATE TABLE `user`  (
                          `password` varchar(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL COMMENT '密码（加密存储）',
                          `undergraduate_university_id` int NULL DEFAULT NULL COMMENT '本科学校id',
                          `postgraduate_year` int NULL DEFAULT NULL COMMENT '考研年份',
-                         `create_time` datetime NOT NULL,
+                         `create_time` datetime NULL DEFAULT CURRENT_TIMESTAMP,
+                         `role` varchar(10) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL COMMENT '管理员/用户',
                          PRIMARY KEY (`id`) USING BTREE,
                          UNIQUE INDEX `phone`(`phone` ASC) USING BTREE,
                          UNIQUE INDEX `email`(`email` ASC) USING BTREE,
@@ -562,13 +597,14 @@ CREATE TABLE `user`  (
                          CONSTRAINT `user_ibfk_2` FOREIGN KEY (`undergraduate_university_id`) REFERENCES `university` (`id`) ON DELETE RESTRICT ON UPDATE RESTRICT,
                          CONSTRAINT `ck_user_postgraduate_year` CHECK ((`postgraduate_year` >= 2020) and (`postgraduate_year` <= 2100)),
                          CONSTRAINT `ck_user_target_score` CHECK ((`target_score` >= 0) and (`target_score` <= 500))
-) ENGINE = InnoDB AUTO_INCREMENT = 4 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci COMMENT = '用户信息表' ROW_FORMAT = DYNAMIC;
+) ENGINE = InnoDB AUTO_INCREMENT = 5 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci COMMENT = '用户信息表' ROW_FORMAT = DYNAMIC;
 
 -- ----------------------------
 -- Records of user
 -- ----------------------------
-INSERT INTO `user` VALUES (1, '17638151819', '431149990@qq.com', 350, 'https://cn.bing.com/images/search?q=%e7%8b%97%e5%9b%be%e7%89%87&id=2EB876D55A15C750EEB49CBE06B0292190407486&FORM=IQFRBA', 19, '2026-02-20 21:16:57', '不上岸不改名', 'a2139365', NULL, 2027, '2026-02-20 15:25:25');
-INSERT INTO `user` VALUES (2, '15131324567', '11408@qq.com', 404, NULL, NULL, '2026-02-21 22:41:02', '408', '111111', NULL, 2028, '2026-02-20 23:35:58');
-INSERT INTO `user` VALUES (3, '16432343373', '8888@qq.com', 365, NULL, NULL, '2026-02-21 00:04:29', '！！！', '1234', NULL, 2027, '2026-02-20 23:39:20');
+INSERT INTO `user` VALUES (1, '17797656709', '124r12124@qq.com', 350, 'https://cn.bing.com/images/search?q=%e7%8b%97%e5%9b%be%e7%89%87&id=2EB876D55A15C750EEB49CBE06B0292190407486&FORM=IQFRBA', 19, '2026-03-12 10:11:24', '不上岸不改名', 'a2139365', NULL, 2027, '2026-02-20 15:25:25', 'user');
+INSERT INTO `user` VALUES (2, '15131324567', '11408@qq.com', 404, NULL, NULL, '2026-03-12 10:04:52', '408', '111111', NULL, 2028, '2026-02-20 23:35:58', 'user');
+INSERT INTO `user` VALUES (3, '16432343373', '8888@qq.com', 365, NULL, NULL, '2026-03-12 10:04:54', '！！！', '1234', NULL, 2027, '2026-02-20 23:39:20', 'user');
+INSERT INTO `user` VALUES (4, '17638151819', '431149990@qq.com', NULL, NULL, NULL, '2026-03-12 10:14:06', 'admin', 'admin', NULL, NULL, '2026-03-12 10:12:55', 'admin');
 
 SET FOREIGN_KEY_CHECKS = 1;

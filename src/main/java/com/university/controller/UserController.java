@@ -25,6 +25,15 @@ public class UserController {
         
         User user = userService.login(username, password);
         if (user != null) {
+            // 确保用户有角色，默认为user
+            if (user.getRole() == null) {
+                user.setRole("user");
+            }
+            // 为了演示，将用户名为"admin"的用户设置为管理员
+            if ("admin".equals(username)) {
+                user.setRole("admin");
+            }
+            System.out.println("Login user role: " + user.getRole());
             result.put("success", true);
             result.put("message", "登录成功");
             result.put("user", user);

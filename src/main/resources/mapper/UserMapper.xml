@@ -15,6 +15,7 @@
         <result column="undergraduate_university_id" property="undergraduateUniversityId"/>
         <result column="postgraduate_year" property="postgraduateYear"/>
         <result column="create_time" property="createTime"/>
+        <result column="role" property="role"/>
     </resultMap>
     
     <select id="selectByUsername" resultMap="BaseResultMap">

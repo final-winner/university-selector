@@ -55,7 +55,19 @@ const routes = [
     path: '/ranking',
     name: 'Ranking',
     component: () => import('@/views/Ranking.vue'),
-    meta: { requiresAuth: false }
+    meta: { requiresAuth: true }
+  },
+  {
+    path: '/admin/correction',
+    name: 'AdminCorrection',
+    component: () => import('@/views/AdminCorrection.vue'),
+    meta: { requiresAuth: true }
+  },
+  {
+    path: '/correction/:id',
+    name: 'CorrectionPage',
+    component: () => import('@/views/CorrectionPage.vue'),
+    meta: { requiresAuth: true }
   }
 ]
 

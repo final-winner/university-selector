@@ -16,4 +16,5 @@ public class User {
     private Integer undergraduateUniversityId;
     private Integer postgraduateYear;
     private LocalDateTime createTime;
+    private String role; 
 }

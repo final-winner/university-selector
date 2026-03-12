@@ -8,7 +8,14 @@
         <button type="button" class="btn-outline-secondary flex items-center gap-2" @click="toggleFavorite">
           <Star :class="isFavorited ? 'fill-current text-yellow-500' : 'text-text-secondary'" class="h-4 w-4" /> {{ isFavorited ? '已收藏' : '收藏' }}
         </button>
+        <button type="button" class="btn-outline-secondary flex items-center gap-2" @click="goToCorrectionPage">
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+          </svg> 数据纠错
+        </button>
       </div>
+
+
 
       <div v-if="isLoading" class="text-center py-20">
         <div class="text-gray-400">加载中...</div>
@@ -102,6 +109,8 @@ const university = ref({
 
 // 学院专业数据
 const colleges = ref([])
+
+
 
 // 从后端API获取学院专业数据
 const fetchCollegeData = async () => {
@@ -300,6 +309,12 @@ const getSchoolTypeStyle = (type) => {
 
 const goBack = () => {
   router.back()
+}
+
+// 跳转到数据纠错页面
+const goToCorrectionPage = () => {
+  if (!checkLogin()) return
+  router.push(`/correction/${route.params.id}`)
 }
 
 const toggleFavorite = async () => {

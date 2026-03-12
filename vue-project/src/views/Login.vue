@@ -79,7 +79,18 @@ export default {
           })
         })
         const data = await response.json()
+        console.log('Login response data:', data)
+        console.log('User role:', data.user?.role)
         if (data.success) {
+          // 确保用户对象存在且有角色字段
+          if (!data.user) {
+            console.error('User object is missing in response')
+          } else if (!data.user.role) {
+            console.error('Role field is missing in user object')
+            // 为了安全起见，手动设置角色
+            data.user.role = data.user.username === 'admin' ? 'admin' : 'user'
+            console.log('Manually set role to:', data.user.role)
+          }
           localStorage.setItem('user', JSON.stringify(data.user))
           checkLoginStatus()
           window.$showToast({
@@ -88,9 +99,19 @@ export default {
             type: 'success'
           })
           setTimeout(() => {
-            router.push('/').then(() => {
-              window.location.reload()
-            })
+            // 根据用户角色跳转到不同页面
+            console.log('Checking role:', data.user?.role)
+            if (data.user && data.user.role === 'admin') {
+              console.log('Admin detected, redirecting to admin page')
+              router.push('/admin/correction').then(() => {
+                window.location.reload()
+              })
+            } else {
+              console.log('User detected, redirecting to home page')
+              router.push('/').then(() => {
+                window.location.reload()
+              })
+            }
           }, 1000)
         } else {
           errorMsg.value = data.message || '登录失败'
