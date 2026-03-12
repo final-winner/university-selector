@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.university.mapper.CorrectionMapper">
+    <resultMap id="CorrectionResult" type="com.university.model.Correction">
+        <id column="id" property="id"/>
+        <result column="user_id" property="userId"/>
+        <result column="university_id" property="universityId"/>
+        <result column="type" property="type"/>
+        <result column="field" property="field"/>
+        <result column="current_value" property="currentValue"/>
+        <result column="suggested_value" property="suggestedValue"/>
+        <result column="description" property="description"/>
+        <result column="status" property="status"/>
+        <result column="submit_time" property="submitTime"/>
+        <result column="process_time" property="processTime"/>
+    </resultMap>
+
+    <insert id="insert" parameterType="com.university.model.Correction">
+        INSERT INTO correction (user_id, university_id, type, field, current_value, suggested_value, description, status, submit_time)
+        VALUES (#{userId}, #{universityId}, #{type}, #{field}, #{currentValue}, #{suggestedValue}, #{description}, 'pending', NOW())
+    </insert>
+
+    <select id="selectAll" resultMap="CorrectionResult">
+        SELECT * FROM correction
+        ORDER BY submit_time DESC
+    </select>
+
+    <select id="selectByStatus" parameterType="string" resultMap="CorrectionResult">
+        SELECT * FROM correction
+        WHERE status = #{status}
+        ORDER BY submit_time DESC
+    </select>
+
+    <select id="selectById" parameterType="int" resultMap="CorrectionResult">
+        SELECT * FROM correction
+        WHERE id = #{id}
+    </select>
+
+    <update id="updateStatus" parameterType="map">
+        UPDATE correction
+        SET status = #{status}, process_time = #{processTime}
+        WHERE id = #{id}
+    </update>
+</mapper>

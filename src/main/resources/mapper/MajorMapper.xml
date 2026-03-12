@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.university.mapper.MajorMapper">
+    <!-- 获取所有专业列表 -->
+    <select id="getAllMajors" resultType="java.util.Map">
+        SELECT id, name, code, master_type 
+        FROM major 
+        WHERE id IN (SELECT MIN(id) FROM major GROUP BY name, code)
+    </select>
+
+    <!-- 检查指定院校是否开设了指定名称和代码的专业 -->
+    <select id="checkMajorExistsByNameAndCode" resultType="java.lang.Integer">
+        SELECT COUNT(*) 
+        FROM major 
+        WHERE university_id = #{universityId} AND name = #{majorName} AND code = #{majorCode}
+    </select>
+</mapper>
