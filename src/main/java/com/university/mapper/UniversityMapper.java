@@ -14,9 +14,11 @@ public interface UniversityMapper {
     List<University> selectByProvince(String province);
     List<University> selectByCity(String city);
     List<Map<String, Object>> getCollegesByUniversityId(Integer universityId);
+    List<Map<String, Object>> getRetestScoresByUniversityAndMajor(@Param("universityId") Integer universityId, @Param("majorId") Integer majorId);
     List<University> selectHotUniversities();
     int updateCollectionNum(@Param("universityId") Integer universityId, @Param("increment") int increment);
     int insert(University university);
     int update(University university);
     int deleteById(Integer id);
+    List<University> selectByName(String name);
 }

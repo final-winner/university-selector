@@ -1,7 +1,7 @@
 <template>
   <div class="university-list">
     <div class="container py-10">
-      <h1 class="page-title text-center text-3xl font-bold text-primary mb-16">院校列表</h1>
+      <h1 class="page-title text-center text-3xl font-bold text-primary mb-16">院校库</h1>
       
       <!-- 搜索和筛选区域 -->
       <div class="search-filter-container">

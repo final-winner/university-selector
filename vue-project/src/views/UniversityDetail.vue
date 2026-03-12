@@ -68,7 +68,7 @@
         
         <!-- 学院专业数据模块 -->
         <div class="info-section bg-white p-7 rounded-xl shadow-sm" style="margin-top: 60px;">
-          <CollegeMajorChart :colleges="colleges" />
+          <CollegeMajorChart :colleges="colleges" :university-website="university.official_website" />
         </div>
       </div>
 
@@ -104,7 +104,9 @@ const university = ref({
   level: '',
   code: '',
   province: '',
-  introduction: ''
+  introduction: '',
+  official_website: '',
+  graduate_school_website: ''
 })
 
 // 学院专业数据

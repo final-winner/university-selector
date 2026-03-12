@@ -4,8 +4,13 @@
     <div class="mb-8">
       <h2 class="text-2xl font-bold text-primary mb-6 pb-3 border-b-2 border-border-color">学院专业数据</h2>
       <div class="text-sm text-text-light flex flex-col items-start">
-        <div>信息来源：院校官网</div>
-        <div class="mt-1">更新时间：2026-03-03</div>
+        <div v-if="colleges && colleges.length > 0">
+          <span>信息来源：</span>
+          <span v-if="collegeWebsite" class="text-primary ml-1">{{ collegeWebsite }}</span>
+          <span v-else>院校官网</span>
+        </div>
+        <div v-else>信息来源：院校官网</div>
+        <div class="mt-1">更新时间：{{ latestUpdateTime }}</div>
       </div>
     </div>
     
@@ -21,9 +26,9 @@
         <div class="college-header mb-6">
           <h3 class="text-xl font-bold text-primary mb-4">{{ college.collegeName }}</h3>
           <div class="flex items-start">
-            <h4 class="text-sm font-medium text-primary mr-2">院系简介：</h4>
-            <p class="text-text-light text-sm text-gray-600">{{ college.introduction || '暂无简介' }}</p>
-          </div>
+              <h4 class="text-sm font-medium text-primary mr-2 whitespace-nowrap">院系简介：</h4>
+              <p class="text-text-light text-sm text-gray-600">{{ college.introduction || '暂无简介' }}</p>
+            </div>
         </div>
         
         <!-- 专业选择器：优化布局+样式 -->
@@ -59,9 +64,7 @@
                 <tr class="bg-primary text-white">
                   <th class="text-center py-3 px-3">年份</th>
                   <th class="text-center py-3 px-3">复试分数线</th>
-                  <th class="text-center py-3 px-3">录取最低分</th>
-                  <th class="text-center py-3 px-3">录取最高分</th>
-                  <th class="text-center py-3 px-3">录取平均分</th>
+                  <th class="text-center py-3 px-3">信息来源</th>
                 </tr>
               </thead>
               <tbody>
@@ -75,16 +78,11 @@
                   ]"
                 >
                   <td class="py-3 px-3 font-medium">{{ item.year }}</td>
-                  <td class="py-3 px-3 text-primary font-medium">{{ item.reexamScore }}</td>
+                  <td class="py-3 px-3 text-primary font-medium">{{ item.retestScore }}</td>
                   <td class="py-3 px-3">
-                    <span v-if="item.minScore" class="text-green-600">{{ item.minScore }}</span>
-                    <span v-else class="text-text-light text-gray-400">暂无数据</span>
+                    <span v-if="item.dataSource" class="text-primary">{{ item.dataSource }}</span>
+                    <span v-else class="text-text-light text-gray-400">院校官网</span>
                   </td>
-                  <td class="py-3 px-3">
-                    <span v-if="item.maxScore" class="text-red-600">{{ item.maxScore }}</span>
-                    <span v-else class="text-text-light text-gray-400">暂无数据</span>
-                  </td>
-                  <td class="py-3 px-3 text-blue-600 font-medium">{{ item.avgScore }}</td>
                 </tr>
               </tbody>
             </table>
@@ -117,23 +115,7 @@
             暂无该专业复试分数线数据
           </div>
 
-          <!-- 录取分数图表 -->
-          <h4 class="text-sm font-medium text-primary mb-4 flex items-center">
-            <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path>
-            </svg>
-            录取分数趋势图
-          </h4>
-          
-          <div v-if="scoreData[college.collegeId] && scoreData[college.collegeId].length > 0" class="chart-container">
-            <div :ref="el => chartRefs[`${college.collegeId}-admission`] = el" style="width: 100%; height: 300px;"></div>
-          </div>
-          <div v-else class="text-text-secondary text-sm py-8 text-center bg-gray-50 rounded-lg border border-gray-100">
-            <svg class="w-8 h-8 mx-auto mb-2 text-gray-300" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"></path>
-            </svg>
-            暂无该专业录取分数数据
-          </div>
+
         </div>
       </div>
     </div>
@@ -141,14 +123,53 @@
 </template>
 
 <script setup>
-import { ref, onMounted, onUnmounted, watch, nextTick } from 'vue'
+import { ref, computed, onMounted, onUnmounted, watch, nextTick } from 'vue'
 import * as echarts from 'echarts'
 
 const props = defineProps({
   colleges: {
     type: Array,
     default: () => []
+  },
+  universityWebsite: {
+    type: String,
+    default: ''
   }
+})
+
+// 计算属性：如果有大学官网就使用，否则使用研究生院官网（如果有的话）
+const collegeWebsite = computed(() => {
+  return props.universityWebsite || ''
+})
+
+// 计算属性：获取最新的更新时间
+const latestUpdateTime = computed(() => {
+  let latestTime = null
+  
+  // 遍历所有学院和专业，找到最新的更新时间
+  props.colleges.forEach(college => {
+    college.majorList.forEach(major => {
+      major.scoreData.forEach(data => {
+        if (data.updateTime) {
+          const updateTime = new Date(data.updateTime)
+          if (!latestTime || updateTime > latestTime) {
+            latestTime = updateTime
+          }
+        }
+      })
+    })
+  })
+  
+  // 格式化时间为YYYY-MM-DD格式
+  if (latestTime) {
+    const year = latestTime.getFullYear()
+    const month = String(latestTime.getMonth() + 1).padStart(2, '0')
+    const day = String(latestTime.getDate()).padStart(2, '0')
+    return `${year}-${month}-${day}`
+  }
+  
+  // 如果没有找到更新时间，返回默认值
+  return '2026-03-12'
 })
 
 const selectedMajors = ref({})
@@ -191,18 +212,12 @@ const handleMajorChange = (collegeId) => {
     updateScoreData(collegeId, majorId)
   } else {
     scoreData.value[collegeId] = []
-    // 销毁两个图表
+    // 销毁复试分数线图表
     const reexamChartKey = `${collegeId}-reexam`
-    const admissionChartKey = `${collegeId}-admission`
     
     if (charts.value[reexamChartKey]) {
       charts.value[reexamChartKey].dispose()
       charts.value[reexamChartKey] = null
-    }
-    
-    if (charts.value[admissionChartKey]) {
-      charts.value[admissionChartKey].dispose()
-      charts.value[admissionChartKey] = null
     }
   }
 }
@@ -234,10 +249,10 @@ const updateReexamChart = (collegeId, data) => {
   }
   
   const years = data.map(item => item.year)
-  const reexamScores = data.map(item => item.reexamScore)
+  const retestScores = data.map(item => item.retestScore)
   
   // 计算Y轴自适应范围
-  const allScores = reexamScores.filter(Boolean)
+  const allScores = retestScores.filter(Boolean)
   const minScore = Math.min(...allScores)
   const maxScore = Math.max(...allScores)
   const yMin = Math.floor((minScore - 5) / 10) * 10
@@ -300,7 +315,7 @@ const updateReexamChart = (collegeId, data) => {
           width: 4,
           type: 'solid'
         },
-        data: reexamScores,
+        data: retestScores,
         itemStyle: { color: '#1E40AF' },
         symbol: 'circle',
         symbolSize: 10
@@ -464,7 +479,6 @@ const updateAdmissionChart = (collegeId, data) => {
 // 更新图表
 const updateChart = (collegeId, data) => {
   updateReexamChart(collegeId, data)
-  updateAdmissionChart(collegeId, data)
 }
 
 // 监听 colleges 变化

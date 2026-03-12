@@ -7,7 +7,8 @@
             <img src="/image/408.png" alt="408教父" class="img-fluid" style="height: 56px;">
           </div>
           
-          <ul class="d-none d-md-flex ml-8 list-none">
+          <!-- 普通用户导航 -->
+          <ul v-if="!isAdmin" class="d-none d-md-flex ml-8 list-none">
             <li class="list-item">
               <router-link class="nav-link" to="/" @click="closeNavbar">
                 <Home class="h-3 w-3 mr-2" />
@@ -17,26 +18,36 @@
             <li class="list-item">
               <router-link class="nav-link" to="/university-list" @click="closeNavbar">
                 <List class="h-3 w-3 mr-2" />
-                院校列表
+                院校库
               </router-link>
             </li>
             <li class="list-item">
               <router-link class="nav-link" to="/ranking" @click="closeNavbar">
                 <Award class="h-3 w-3 mr-2" />
-                排行榜
+                热门院校
               </router-link>
             </li>
             <li class="list-item">
               <a class="nav-link" href="javascript:void(0)" @click="handleAuthNavigate('/recommend', true)">
                 <Lightbulb class="h-3 w-3 mr-2" />
-                智能推荐
+                我的择校方案
               </a>
             </li>
             <li class="list-item">
               <a class="nav-link" href="javascript:void(0)" @click="handleAuthNavigate('/compare', true)">
                 <BarChart class="h-3 w-3 mr-2" />
-                数据对比
+                院校对比
               </a>
+            </li>
+          </ul>
+          
+          <!-- 管理员导航 -->
+          <ul v-else class="d-none d-md-flex ml-8 list-none">
+            <li class="list-item">
+              <router-link class="nav-link" to="/admin/correction" @click="closeNavbar">
+                <Award class="h-3 w-3 mr-2" />
+                管理后台
+              </router-link>
             </li>
           </ul>
         </div>
@@ -65,7 +76,8 @@
       </div>
       
       <div v-if="isNavbarOpen" class="d-md-none py-4 space-y-3">
-        <ul class="space-y-3">
+        <!-- 普通用户导航 -->
+        <ul v-if="!isAdmin" class="space-y-3">
           <li>
             <router-link class="nav-link" to="/" @click="closeNavbar">
               <Home class="h-3 w-3 mr-2" />
@@ -75,26 +87,36 @@
           <li>
             <router-link class="nav-link" to="/university-list" @click="closeNavbar">
               <List class="h-3 w-3 mr-2" />
-              院校列表
+              院校库
             </router-link>
           </li>
           <li>
             <router-link class="nav-link" to="/ranking" @click="closeNavbar">
               <Award class="h-3 w-3 mr-2" />
-              排行榜
+              热门院校
             </router-link>
           </li>
           <li>
             <a class="nav-link" href="javascript:void(0)" @click="handleAuthNavigate('/recommend', true)">
               <Lightbulb class="h-3 w-3 mr-2" />
-              智能推荐
+              我的择校方案
             </a>
           </li>
           <li>
             <a class="nav-link" href="javascript:void(0)" @click="handleAuthNavigate('/compare', true)">
               <BarChart class="h-3 w-3 mr-2" />
-              数据对比
+              院校对比
             </a>
+          </li>
+        </ul>
+        
+        <!-- 管理员导航 -->
+        <ul v-else class="space-y-3">
+          <li>
+            <router-link class="nav-link" to="/admin/correction" @click="closeNavbar">
+              <Award class="h-3 w-3 mr-2" />
+              管理后台
+            </router-link>
           </li>
         </ul>
         <div class="d-flex flex-column gap-3 mt-4">
@@ -116,7 +138,7 @@
 </template>
 
 <script>
-import { ref, onMounted } from 'vue'
+import { ref, onMounted, computed } from 'vue'
 import { Home, List, Award, Lightbulb, BarChart, Menu, User } from 'lucide-vue-next'
 import { useRouter } from 'vue-router'
 import { useAuth } from '@/composables/useAuth'
@@ -136,6 +158,11 @@ export default {
     const router = useRouter()
     const { isLoggedIn, user, checkLoginStatus, logout, handleNavigate } = useAuth()
     const isNavbarOpen = ref(false)
+    
+    // 检查是否为管理员
+    const isAdmin = computed(() => {
+      return user.value && user.value.role === 'admin'
+    })
 
     /**
      * 处理需要认证的导航
@@ -181,6 +208,7 @@ export default {
       isNavbarOpen,
       isLoggedIn,
       user,
+      isAdmin,
       toggleNavbar,
       closeNavbar,
       handleLogout,

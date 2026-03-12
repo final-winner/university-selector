@@ -61,7 +61,7 @@ const routes = [
     path: '/admin/correction',
     name: 'AdminCorrection',
     component: () => import('@/views/AdminCorrection.vue'),
-    meta: { requiresAuth: true }
+    meta: { requiresAuth: true, requiresAdmin: true }
   },
   {
     path: '/correction/:id',
@@ -94,6 +94,40 @@ router.beforeEach((to, from, next) => {
         alert('请先登录')
         next('/login')
       }
+      return
+    }
+    
+    const user = JSON.parse(userData)
+    
+    if (to.meta.requiresAdmin) {
+      if (user.role !== 'admin') {
+        if (window.$showToast) {
+          window.$showToast({
+            title: '提示',
+            message: '您没有权限访问该页面',
+            type: 'warning',
+            duration: 1500
+          })
+        } else {
+          alert('您没有权限访问该页面')
+        }
+        next('/')
+        return
+      }
+    }
+    
+    if (user.role === 'admin' && !to.meta.requiresAdmin) {
+      if (window.$showToast) {
+        window.$showToast({
+          title: '提示',
+          message: '管理员请访问管理后台',
+          type: 'info',
+          duration: 1500
+        })
+      } else {
+        alert('管理员请访问管理后台')
+      }
+      next('/admin/correction')
       return
     }
   }

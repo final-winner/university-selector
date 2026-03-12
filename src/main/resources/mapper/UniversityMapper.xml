@@ -70,10 +70,12 @@
             <result column="major_name" property="majorName"/>
             <collection property="scoreData" ofType="java.util.Map" javaType="java.util.List">
                 <result column="year" property="year"/>
-                <result column="reexamScore" property="reexamScore"/>
+                <result column="retestScore" property="retestScore"/>
                 <result column="minScore" property="minScore"/>
                 <result column="maxScore" property="maxScore"/>
                 <result column="avgScore" property="avgScore"/>
+                <result column="data_source" property="dataSource"/>
+                <result column="update_time" property="updateTime"/>
             </collection>
         </collection>
     </resultMap>
@@ -86,10 +88,12 @@
             m.id AS major_id,
             m.name AS major_name,
             pd.year,
-            pd.retest_score AS reexamScore,
+            pd.retest_score AS retestScore,
             pd.lowest_score AS minScore,
             pd.highest_score AS maxScore,
-            pd.average_score AS avgScore
+            pd.average_score AS avgScore,
+            pd.data_source,
+            pd.update_time
         FROM
             department d
         LEFT JOIN
@@ -109,4 +113,27 @@
     <update id="updateCollectionNum">
         UPDATE university SET collection_num = collection_num + #{increment} WHERE id = #{universityId} AND (#{increment} > 0 OR collection_num > 0)
     </update>
+    
+    <select id="selectByName" resultMap="BaseResultMap">
+        SELECT * FROM university WHERE name LIKE CONCAT('%', #{name}, '%') ORDER BY id
+    </select>
+    
+    <!-- 获取指定院校和专业的近3年复试线数据 -->
+    <select id="getRetestScoresByUniversityAndMajor" resultType="java.util.Map">
+        SELECT 
+            pd.year, 
+            pd.retest_score AS retestScore
+        FROM 
+            department d
+        JOIN 
+            major m ON d.id = m.department_id
+        JOIN 
+            postgraduate_data pd ON m.id = pd.major_id
+        WHERE 
+            m.university_id = #{universityId} 
+            AND m.id = #{majorId}
+        ORDER BY 
+            pd.year ASC
+        LIMIT 3
+    </select>
 </mapper>

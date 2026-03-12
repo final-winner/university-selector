@@ -41,6 +41,54 @@
               </select>
             </div>
           </div>
+          <div class="form-row">
+            <div class="form-group">
+              <label>意向地区</label>
+              <select v-model="formData.targetRegion" style="width: 100%; padding: 14px 18px; border: 2px solid #e6f0ff; border-radius: 12px; font-size: 1rem; transition: all 0.3s ease; background: white; color: #1a365d; outline: none;" onfocus="this.style.borderColor = 'var(--primary-color)'; this.style.boxShadow = '0 0 0 3px rgba(30, 58, 138, 0.1)';" onblur="this.style.borderColor = '#e6f0ff'; this.style.boxShadow = 'none';">
+                <option value="">请选择</option>
+                <option value="华北">华北</option>
+                <option value="华东">华东</option>
+                <option value="华南">华南</option>
+                <option value="华中">华中</option>
+                <option value="西北">西北</option>
+                <option value="西南">西南</option>
+                <option value="东北">东北</option>
+                <option value="custom">自定义省份</option>
+              </select>
+            </div>
+            <div class="form-group" v-if="formData.targetRegion === 'custom'">
+              <label>自定义省份</label>
+              <input
+                type="text"
+                v-model="formData.customRegion"
+                placeholder="请输入省份名称"
+                style="width: 100%; padding: 14px 18px; border: 2px solid #e6f0ff; border-radius: 12px; font-size: 1rem; transition: all 0.3s ease; background: white; color: #1a365d; outline: none;"
+                onfocus="this.style.borderColor = 'var(--primary-color)'; this.style.boxShadow = '0 0 0 3px rgba(30, 58, 138, 0.1)';"
+                onblur="this.style.borderColor = '#e6f0ff'; this.style.boxShadow = 'none';"
+              />
+            </div>
+          </div>
+          <div class="form-group">
+            <label>偏好筛选</label>
+            <div class="filter-group">
+              <div class="filter-item">
+                <input type="checkbox" id="985" value="985" v-model="formData.universityLevel">
+                <label for="985">985</label>
+              </div>
+              <div class="filter-item">
+                <input type="checkbox" id="211" value="211" v-model="formData.universityLevel">
+                <label for="211">211</label>
+              </div>
+              <div class="filter-item">
+                <input type="checkbox" id="doubleTop" value="双一流" v-model="formData.universityLevel">
+                <label for="doubleTop">双一流</label>
+              </div>
+              <div class="filter-item">
+                <input type="checkbox" id="doubleNon" value="双非" v-model="formData.universityLevel">
+                <label for="doubleNon">双非</label>
+              </div>
+            </div>
+          </div>
           <button class="btn btn-primary recommend-btn" @click="getRecommendations">获取推荐</button>
         </div>
 
@@ -158,7 +206,10 @@ export default {
     const formData = ref({
       score: '',
       subjectCategory: '',
-      degreeType: ''
+      degreeType: '',
+      targetRegion: '',
+      customRegion: '',
+      universityLevel: []
     })
     const showResult = ref(false)
     const sprintSchools = ref([])
@@ -180,11 +231,6 @@ export default {
       showResult.value = true
       const score = parseInt(formData.value.score) || 0
       
-      // 根据分数生成推荐院校
-      // 冲刺院校：分数要求高于用户分数10-20分
-      // 稳妥院校：分数要求与用户分数相近
-      // 保底院校：分数要求低于用户分数10-20分
-      
       // 模拟院校数据
       const allSchools = [
         // 冲刺院校（高分）
@@ -205,10 +251,48 @@ export default {
         { id: 9, name: '南京航空航天大学', location: '江苏', type: '211', level: 'B+', requiredScore: 340, reason: '综合实力强，计算机专业发展迅速' }
       ]
       
+      // 地区映射
+      const regionMap = {
+        '华北': ['北京', '天津', '河北', '山西', '内蒙古'],
+        '华东': ['上海', '江苏', '浙江', '安徽', '福建', '江西', '山东'],
+        '华南': ['广东', '广西', '海南'],
+        '华中': ['河南', '湖北', '湖南'],
+        '西北': ['陕西', '甘肃', '青海', '宁夏', '新疆'],
+        '西南': ['重庆', '四川', '贵州', '云南', '西藏'],
+        '东北': ['辽宁', '吉林', '黑龙江']
+      }
+      
+      // 根据筛选条件过滤院校
+      let filteredSchools = [...allSchools]
+      
+      // 意向地区筛选
+      if (formData.value.targetRegion) {
+        if (formData.value.targetRegion === 'custom' && formData.value.customRegion) {
+          // 自定义省份筛选
+          const customRegion = formData.value.customRegion
+          filteredSchools = filteredSchools.filter(school => 
+            school.location.includes(customRegion)
+          )
+        } else if (formData.value.targetRegion !== 'custom') {
+          // 地区筛选
+          const regions = regionMap[formData.value.targetRegion] || []
+          filteredSchools = filteredSchools.filter(school => 
+            regions.includes(school.location)
+          )
+        }
+      }
+      
+      // 院校层次筛选
+      if (formData.value.universityLevel && formData.value.universityLevel.length > 0) {
+        filteredSchools = filteredSchools.filter(school => 
+          formData.value.universityLevel.includes(school.type)
+        )
+      }
+      
       // 分类院校
-      sprintSchools.value = allSchools.filter(school => school.requiredScore > score + 10).slice(0, 3)
-      safeSchools.value = allSchools.filter(school => school.requiredScore >= score - 10 && school.requiredScore <= score + 10).slice(0, 5)
-      backupSchools.value = allSchools.filter(school => school.requiredScore < score - 10).slice(0, 3)
+      sprintSchools.value = filteredSchools.filter(school => school.requiredScore > score + 10).slice(0, 3)
+      safeSchools.value = filteredSchools.filter(school => school.requiredScore >= score - 10 && school.requiredScore <= score + 10).slice(0, 5)
+      backupSchools.value = filteredSchools.filter(school => school.requiredScore < score - 10).slice(0, 3)
       
       // 计算匹配度
       sprintSchools.value.forEach(school => {
@@ -524,6 +608,39 @@ export default {
   color: #ef4444;
   font-weight: bold;
   margin-left: 4px;
+}
+
+.filter-group {
+  display: flex;
+  gap: 20px;
+  flex-wrap: wrap;
+  margin-top: 10px;
+}
+
+.filter-item {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 1rem;
+  color: var(--text-primary);
+}
+
+.filter-item input[type="checkbox"] {
+  width: 18px;
+  height: 18px;
+  accent-color: var(--primary-color);
+  cursor: pointer;
+}
+
+.filter-item label {
+  margin: 0;
+  cursor: pointer;
+  font-weight: 400;
+  transition: color 0.2s ease;
+}
+
+.filter-item label:hover {
+  color: var(--primary-color);
 }
 
 

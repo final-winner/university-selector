@@ -5,14 +5,22 @@
         <div class="row">
           <div class="col-md-6">
             <div class="footer-nav">
-              <router-link to="/" class="nav-link">首页</router-link>
-              <router-link to="/university-list" class="nav-link">院校列表</router-link>
-              <router-link to="/recommend" class="nav-link">智能推荐</router-link>
-              <router-link to="/compare" class="nav-link">数据对比</router-link>
-              <router-link to="/login" class="nav-link">登录/注册</router-link>
-              <router-link to="/about" class="nav-link">关于我们</router-link>
-              <router-link to="/help" class="nav-link">帮助中心</router-link>
-              <router-link to="/sitemap" class="nav-link">网站地图</router-link>
+              <!-- 普通用户导航 -->
+              <template v-if="!isAdmin">
+                <router-link to="/" class="nav-link">首页</router-link>
+                <router-link to="/university-list" class="nav-link">院校库</router-link>
+                <router-link to="/recommend" class="nav-link">我的择校方案</router-link>
+                <router-link to="/compare" class="nav-link">院校对比</router-link>
+                <router-link to="/login" class="nav-link">登录/注册</router-link>
+                <router-link to="/about" class="nav-link">关于我们</router-link>
+                <router-link to="/help" class="nav-link">帮助中心</router-link>
+                <router-link to="/sitemap" class="nav-link">网站地图</router-link>
+              </template>
+              
+              <!-- 管理员导航 -->
+              <template v-else>
+                <router-link to="/admin/correction" class="nav-link">管理后台</router-link>
+              </template>
             </div>
           </div>
           <div class="col-md-6">
@@ -39,7 +47,9 @@
 </template>
 
 <script>
+import { computed } from 'vue'
 import { Phone, Mail, Clock, MessageSquare, Twitter, MessageCircle } from 'lucide-vue-next'
+import { useAuth } from '@/composables/useAuth'
 
 export default {
   name: 'Footer',
@@ -50,6 +60,18 @@ export default {
     MessageSquare,
     Twitter,
     MessageCircle
+  },
+  setup() {
+    const { user } = useAuth()
+    
+    // 检查是否为管理员
+    const isAdmin = computed(() => {
+      return user.value && user.value.role === 'admin'
+    })
+    
+    return {
+      isAdmin
+    }
   }
 }
 </script>
