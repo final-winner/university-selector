@@ -21,7 +21,7 @@
               />
             </div>
             <div class="form-group">
-              <label>学科门类 <span class="required">*</span></label>
+              <label>意向专业<span class="required">*</span></label>
               <select v-model="formData.subjectCategory" required style="width: 100%; padding: 14px 18px; border: 2px solid #e6f0ff; border-radius: 12px; font-size: 1rem; transition: all 0.3s ease; background: white; color: #1a365d; outline: none;" onfocus="this.style.borderColor = 'var(--primary-color)'; this.style.boxShadow = '0 0 0 3px rgba(30, 58, 138, 0.1)';" onblur="this.style.borderColor = '#e6f0ff'; this.style.boxShadow = 'none';">
                 <option value="">请选择</option>
                 <option value="0812">计算机科学与技术</option>
@@ -194,7 +194,6 @@
 import { ref } from 'vue'
 import { useAuth } from '@/composables/useAuth'
 
-const { checkLogin, user, checkLoginStatus } = useAuth()
 const API_BASE_URL = 'http://localhost:8080'
 
 export default {
@@ -202,6 +201,7 @@ export default {
   components: {
   },
   setup() {
+    const { checkLogin, user, checkLoginStatus } = useAuth()
     checkLoginStatus()
     const formData = ref({
       score: '',

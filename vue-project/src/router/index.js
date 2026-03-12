@@ -46,6 +46,24 @@ const routes = [
     component: () => import('@/views/ForgotPassword.vue')
   },
   {
+    path: '/about',
+    name: 'About',
+    component: () => import('@/views/Placeholder.vue'),
+    props: { title: '关于我们' }
+  },
+  {
+    path: '/help',
+    name: 'Help',
+    component: () => import('@/views/Placeholder.vue'),
+    props: { title: '帮助中心' }
+  },
+  {
+    path: '/sitemap',
+    name: 'Sitemap',
+    component: () => import('@/views/Placeholder.vue'),
+    props: { title: '网站地图' }
+  },
+  {
     path: '/profile',
     name: 'Profile',
     component: () => import('@/views/Profile.vue'),

@@ -248,13 +248,36 @@ import { ref, onMounted, computed } from 'vue'
 export default {
   name: 'Compare',
   setup() {
+    // ----------------------
+    // 配置常量
+    // ----------------------
+    const API_BASE_URL = 'http://localhost:8080'
+    
+    // ----------------------
+    // 核心数据
+    // ----------------------
+    // 对比表单数据
     const compareData = ref({
       university1: '',
       university2: '',
       majorId: ''
     })
     
+    // 对比结果数据
+    const showResult = ref(false)
+    const isLoading = ref(false)
+    
+    // 院校数据
+    const uni1 = ref({})
+    const uni2 = ref({})
+    const hotUniversities = ref([])
+    
+    // 专业数据
+    const availableMajors = ref([])
+    
+    // ----------------------
     // 自动完成功能相关数据
+    // ----------------------
     const allUniversities = ref([]) // 存储所有院校数据
     const filteredUniversities = ref({
       university1: [],
@@ -264,28 +287,14 @@ export default {
       university1: false,
       university2: false
     }) // 控制下拉列表显示状态
-    
-    const availableMajors = ref([])
-    const showResult = ref(false)
-    const uni1 = ref({
-      latestRetestScore: 380,
-      retestScoreTrend: '+5%',
-      enrollmentNum: 150,
-      difficultyScore: 8.5,
-      subjectRating: 'A+'
-    })
-    const uni2 = ref({
-      latestRetestScore: 365,
-      retestScoreTrend: '-2%',
-      enrollmentNum: 120,
-      difficultyScore: 7.8,
-      subjectRating: 'A'
-    })
-    const hotUniversities = ref([])
-    const isLoading = ref(false)
-    const API_BASE_URL = 'http://localhost:8080'
 
-    // 智能结论计算属性
+    // ----------------------
+    // 计算属性
+    // ----------------------
+    /**
+     * 智能结论计算属性
+     * 根据院校对比数据自动生成对比结论
+     */
     const intelligentConclusion = computed(() => {
       if (!uni1.value || !uni2.value) return ''
       
@@ -318,27 +327,14 @@ export default {
       }
     })
 
-    const fetchUniversities = async () => {
-      try {
-        isLoading.value = true
-        const response = await fetch(`${API_BASE_URL}/university/list`)
-        if (!response.ok) {
-          throw new Error(`HTTP error! status: ${response.status}`)
-        }
-        const data = await response.json()
-        universities.value = data
-      } catch (err) {
-        console.error('获取院校数据失败:', err)
-        window.$showToast({
-          title: '错误',
-          message: '获取院校数据失败，请稍后重试',
-          type: 'error'
-        })
-      } finally {
-        isLoading.value = false
-      }
-    }
 
+
+    // ----------------------
+    // 数据获取函数
+    // ----------------------
+    /**
+     * 获取热门院校数据
+     */
     const fetchHotUniversities = async () => {
       try {
         const response = await fetch(`${API_BASE_URL}/university/hot`)
@@ -352,7 +348,9 @@ export default {
       }
     }
     
-    // 获取所有院校数据（用于自动完成）
+    /**
+     * 获取所有院校数据（用于自动完成）
+     */
     const fetchAllUniversities = async () => {
       try {
         const response = await fetch(`${API_BASE_URL}/university/list`)
@@ -366,6 +364,9 @@ export default {
       }
     }
 
+    /**
+     * 获取可用专业列表
+     */
     const fetchAvailableMajors = async () => {
       try {
         // 从后端获取真实专业数据
@@ -398,6 +399,11 @@ export default {
       }
     }
 
+    /**
+     * 根据名称搜索院校
+     * @param {string} name - 院校名称
+     * @returns {Promise<Array>} - 搜索结果列表
+     */
     const searchUniversity = async (name) => {
       try {
         const response = await fetch(`${API_BASE_URL}/university/search?name=${encodeURIComponent(name)}`)
@@ -411,7 +417,14 @@ export default {
       }
     }
     
-    // 处理输入事件，过滤院校列表
+    // ----------------------
+    // 自动完成功能函数
+    // ----------------------
+    /**
+     * 处理输入事件，过滤院校列表
+     * @param {string} field - 字段名（university1或university2）
+     * @param {Event} event - 输入事件
+     */
     const handleInput = (field, event) => {
       const inputValue = event.target.value.toLowerCase().trim()
       if (inputValue.length === 0) {
@@ -428,7 +441,10 @@ export default {
       showDropdowns.value[field] = true
     }
     
-    // 显示下拉列表
+    /**
+     * 显示下拉列表
+     * @param {string} field - 字段名（university1或university2）
+     */
     const showDropdown = (field) => {
       const inputValue = compareData.value[field].toLowerCase().trim()
       if (inputValue.length > 0) {
@@ -439,7 +455,10 @@ export default {
       showDropdowns.value[field] = true
     }
     
-    // 隐藏下拉列表
+    /**
+     * 隐藏下拉列表
+     * @param {string} field - 字段名（university1或university2）
+     */
     const hideDropdown = (field) => {
       // 添加延迟，以便点击下拉项时能先触发mousedown事件
       setTimeout(() => {
@@ -447,7 +466,11 @@ export default {
       }, 200)
     }
     
-    // 选择院校
+    /**
+     * 选择院校
+     * @param {string} field - 字段名（university1或university2）
+     * @param {string} universityName - 院校名称
+     */
     const selectUniversity = (field, universityName) => {
       compareData.value[field] = universityName
       showDropdowns.value[field] = false
@@ -466,18 +489,6 @@ export default {
         return false
       }
     }
-
-    // 生成模拟的复试线趋势数据
-    const generateMockTrendData = () => {
-      const baseScore = Math.floor(Math.random() * 50) + 320
-      return [
-        { year: '2023', score: baseScore + Math.floor(Math.random() * 10) },
-        { year: '2024', score: baseScore + Math.floor(Math.random() * 15) },
-        { year: '2025', score: baseScore + Math.floor(Math.random() * 20) }
-      ]
-    }
-
-
 
     const compare = async () => {
       if (compareData.value.university1 && compareData.value.university2 && compareData.value.majorId) {
@@ -525,21 +536,21 @@ export default {
               if (!checkResult1 && !checkResult2) {
                 window.$showToast({
                   title: '提示',
-                  message: `两所院校均未开设所选专业（${availableMajors.value.find(m => m.id == majorId)?.name || '未知专业'}），无法进行对比！`,
+                  message: `两所院校均未开设所选专业（${majorName}），无法进行对比！`,
                   type: 'warning'
                 })
                 return
               } else if (!checkResult1) {
                 window.$showToast({
                   title: '提示',
-                  message: `${results1[0].name}未开设所选专业（${availableMajors.value.find(m => m.id == majorId)?.name || '未知专业'}），无法进行对比！`,
+                  message: `${results1[0].name}未开设所选专业（${majorName}），无法进行对比！`,
                   type: 'warning'
                 })
                 return
               } else if (!checkResult2) {
                 window.$showToast({
                   title: '提示',
-                  message: `${results2[0].name}未开设所选专业（${availableMajors.value.find(m => m.id == majorId)?.name || '未知专业'}），无法进行对比！`,
+                  message: `${results2[0].name}未开设所选专业（${majorName}），无法进行对比！`,
                   type: 'warning'
                 })
                 return
